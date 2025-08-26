@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, User, Cloud, HardDrive } from "lucide-react";
 import { Task, Priority } from "@/types/task";
-import { AITaskHelper } from "@/components/AITaskHelper";
+
 import { AuthModal } from "@/components/AuthModal";
 import { dataService } from "@/lib/dataService";
 import { CompletedTasksWrapper } from "@/components/CompletedTasksWrapper";
@@ -180,7 +180,7 @@ const Agenda = () => {
           </div>
           <TaskForm onAddTask={addTask} />
           
-          <AITaskHelper tasks={tasks} />
+          
           
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3 sm:gap-4">
             <div className="flex gap-2 sm:gap-4">
