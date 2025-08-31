@@ -11,9 +11,10 @@ import {
 
 interface HeaderProps {
   onSignOut?: () => void;
+  showSignOut?: boolean;
 }
 
-export const Header = ({ onSignOut }: HeaderProps) => {
+export const Header = ({ onSignOut, showSignOut = true }: HeaderProps) => {
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -22,11 +23,9 @@ export const Header = ({ onSignOut }: HeaderProps) => {
     <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
       <div className="flex items-center">
         <Link to="/" className="flex items-center">
-          <img
-            src="/placeholder.svg"
-            alt="Logo"
-            className="h-8 w-8 mr-2"
-          />
+          <div className="h-8 w-8 mr-2 rounded-full border-2 border-purple-400 flex items-center justify-center">
+            <div className="text-purple-500 text-sm">🌸</div>
+          </div>
           <h1 className="text-2xl font-dancing-script text-purple-700 font-bold">Productivity App</h1>
         </Link>
       </div>
@@ -96,7 +95,7 @@ export const Header = ({ onSignOut }: HeaderProps) => {
         </NavigationMenuList>
       </NavigationMenu>
 
-      {onSignOut && (
+      {onSignOut && showSignOut && (
         <Button
           onClick={onSignOut}
           variant="outline"

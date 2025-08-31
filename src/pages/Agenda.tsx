@@ -101,7 +101,9 @@ const Agenda = () => {
             <TableHead className="w-8 sm:w-12 text-xs sm:text-sm">Done</TableHead>
             <TableHead className="text-xs sm:text-sm">Task</TableHead>
             <TableHead className="w-20 sm:w-24 text-xs sm:text-sm">Priority</TableHead>
-            <TableHead className="w-16 sm:w-20 text-xs sm:text-sm">Delete</TableHead>
+            <TableHead className="w-16 sm:w-20 text-xs sm:text-sm">
+              <Trash2 className="h-4 w-4 mx-auto text-gray-400" />
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -149,7 +151,7 @@ const Agenda = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-2 sm:p-4 lg:p-8">
       <div className="max-w-6xl mx-auto">
-        <Header onSignOut={handleSignOut} />
+        <Header onSignOut={handleSignOut} showSignOut={isAuthenticated} />
 
         <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Storage Status */}

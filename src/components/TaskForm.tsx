@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { VoiceInput } from "./VoiceInput";
 
 interface TaskFormProps {
   onAddTask: (title: string) => void;
@@ -25,34 +24,15 @@ export const TaskForm = ({ onAddTask }: TaskFormProps) => {
     }
   };
 
-  const handleVoiceTranscript = (text: string) => {
-    setNewTask(text);
-  };
-
-  // Clear task after adding and continue listening
-  const handleAddAndListen = () => {
-    if (newTask.trim()) {
-      onAddTask(newTask);
-      setNewTask("");
-    }
-  };
-
   return (
     <div className="flex gap-4 mb-8">
-      <div className="flex-1 flex items-center relative">
+      <div className="flex-1">
         <Input
           placeholder="Add a new task..."
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="pr-12"
         />
-        <div className="absolute right-2">
-          <VoiceInput 
-            onTranscript={handleVoiceTranscript} 
-            onAddAndListen={handleAddAndListen} 
-          />
-        </div>
       </div>
       <Button
         onClick={handleAddTask}

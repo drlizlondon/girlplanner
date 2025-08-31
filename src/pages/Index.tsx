@@ -29,14 +29,19 @@ const Index = () => {
             <p className="text-sm sm:text-base text-gray-600">Choose how you'd like to use your task manager</p>
           </div>
 
-          <div className="space-y-3">
-            <Button
-              onClick={() => setShowAuthModal(true)}
-              className="w-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white py-3 sm:py-4 rounded-lg transition-all duration-200 hover:shadow-lg text-base sm:text-lg flex items-center justify-center gap-2"
-            >
-              <User className="w-5 h-5" />
-              Login / Sign Up
-            </Button>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Button
+                onClick={() => setShowAuthModal(true)}
+                className="w-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white py-3 sm:py-4 rounded-lg transition-all duration-200 hover:shadow-lg text-base sm:text-lg flex items-center justify-center gap-2"
+              >
+                <User className="w-5 h-5" />
+                Login / Sign Up
+              </Button>
+              <p className="text-xs text-center text-gray-600">
+                Tasks synced across all your devices
+              </p>
+            </div>
             
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -47,23 +52,19 @@ const Index = () => {
               </div>
             </div>
             
-            <Button
-              onClick={() => navigate("/agenda")}
-              variant="outline"
-              className="w-full py-3 sm:py-4 rounded-lg transition-all duration-200 hover:shadow-lg text-base sm:text-lg flex items-center justify-center gap-2"
-            >
-              <ArrowRight className="w-5 h-5" />
-              Use Without Login
-            </Button>
-          </div>
-          
-          <div className="text-center space-y-2">
-            <p className="text-xs text-gray-500">
-              Without login: Tasks stored locally on your device
-            </p>
-            <p className="text-xs text-gray-500">
-              With login: Tasks synced across all your devices
-            </p>
+            <div className="space-y-3">
+              <Button
+                onClick={() => navigate("/agenda")}
+                variant="outline"
+                className="w-full py-3 sm:py-4 rounded-lg transition-all duration-200 hover:shadow-lg text-base sm:text-lg flex items-center justify-center gap-2"
+              >
+                <ArrowRight className="w-5 h-5" />
+                Use Without Login
+              </Button>
+              <p className="text-xs text-center text-gray-600">
+                Tasks stored locally on your device
+              </p>
+            </div>
           </div>
         </div>
       </div>
