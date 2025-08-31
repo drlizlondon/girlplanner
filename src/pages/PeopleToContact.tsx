@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Check, Plus, Trash2, Edit3 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { dataService } from "@/lib/dataService";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +21,7 @@ const PeopleToContact = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [newContactName, setNewContactName] = useState("");
   const [editingComments, setEditingComments] = useState<{ [key: string]: string }>({});
+  const [showingComments, setShowingComments] = useState<{ [key: string]: boolean }>({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -133,7 +134,7 @@ const PeopleToContact = () => {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 font-bold text-center pb-2">
               People to Contact
             </h2>
-            <p className="text-center text-gray-600 text-sm sm:text-base">Keep track of people you need to reach out to</p>
+            <p className="text-center text-gray-600 text-sm sm:text-base">Keep track of who you want to message / respond to</p>
           </div>
 
           {/* Add Contact Form */}
@@ -189,26 +190,83 @@ const PeopleToContact = () => {
                         {contact.name}
                       </TableCell>
                       <TableCell className="p-2 sm:p-4">
-                        <Textarea
-                          value={editingComments[contact.id] !== undefined ? editingComments[contact.id] : contact.comments || ""}
-                          onChange={(e) => {
-                            setEditingComments(prev => ({
-                              ...prev,
-                              [contact.id]: e.target.value
-                            }));
-                          }}
-                          onBlur={() => {
-                            const newComments = editingComments[contact.id] !== undefined ? editingComments[contact.id] : contact.comments || "";
-                            updateComments(contact.id, newComments);
-                            setEditingComments(prev => {
-                              const newState = { ...prev };
-                              delete newState[contact.id];
-                              return newState;
-                            });
-                          }}
-                          placeholder="Add comments..."
-                          className="text-xs sm:text-sm min-h-[60px] resize-none"
-                        />
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setShowingComments(prev => ({
+                                ...prev,
+                                [contact.id]: true
+                              }));
+                              setEditingComments(prev => ({
+                                ...prev,
+                                [contact.id]: contact.comments || ""
+                              }));
+                            }}
+                            className="p-1 hover:bg-gray-100 rounded"
+                          >
+                            <Edit3 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                          </button>
+                          {contact.comments && (
+                            <span className="text-xs sm:text-sm text-gray-600 truncate flex-1">
+                              {contact.comments}
+                            </span>
+                          )}
+                          {showingComments[contact.id] && (
+                            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                              <div className="bg-white p-4 rounded-lg max-w-md w-full mx-4">
+                                <h3 className="font-medium mb-2">Edit Comments for {contact.name}</h3>
+                                <Textarea
+                                  value={editingComments[contact.id] || ""}
+                                  onChange={(e) => {
+                                    setEditingComments(prev => ({
+                                      ...prev,
+                                      [contact.id]: e.target.value
+                                    }));
+                                  }}
+                                  placeholder="Add comments..."
+                                  className="text-xs sm:text-sm min-h-[60px] resize-none mb-4"
+                                />
+                                <div className="flex gap-2 justify-end">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setShowingComments(prev => ({
+                                        ...prev,
+                                        [contact.id]: false
+                                      }));
+                                      setEditingComments(prev => {
+                                        const newState = { ...prev };
+                                        delete newState[contact.id];
+                                        return newState;
+                                      });
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => {
+                                      const newComments = editingComments[contact.id] || "";
+                                      updateComments(contact.id, newComments);
+                                      setShowingComments(prev => ({
+                                        ...prev,
+                                        [contact.id]: false
+                                      }));
+                                      setEditingComments(prev => {
+                                        const newState = { ...prev };
+                                        delete newState[contact.id];
+                                        return newState;
+                                      });
+                                    }}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="p-2 sm:p-4">
                         <Button

@@ -10,6 +10,7 @@ const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleAuthSuccess = () => {
+    setShowAuthModal(false);
     navigate("/agenda");
   };
 
