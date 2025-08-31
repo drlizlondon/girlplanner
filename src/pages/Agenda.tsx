@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, User, Cloud, HardDrive } from "lucide-react";
+import { Check, User, Cloud, HardDrive, Trash2 } from "lucide-react";
 import { Task, Priority } from "@/types/task";
 
 import { AuthModal } from "@/components/AuthModal";
@@ -101,6 +101,7 @@ const Agenda = () => {
             <TableHead className="w-8 sm:w-12 text-xs sm:text-sm">Done</TableHead>
             <TableHead className="text-xs sm:text-sm">Task</TableHead>
             <TableHead className="w-20 sm:w-24 text-xs sm:text-sm">Priority</TableHead>
+            <TableHead className="w-16 sm:w-20 text-xs sm:text-sm">Delete</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -127,6 +128,16 @@ const Agenda = () => {
                   <option value="medium">Med</option>
                   <option value="high">High</option>
                 </select>
+              </TableCell>
+              <TableCell className="p-2 sm:p-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => deleteTask(task.id)}
+                  className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
