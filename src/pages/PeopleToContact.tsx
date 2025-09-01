@@ -207,9 +207,29 @@ const PeopleToContact = () => {
                             <Edit3 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                           </button>
                           {contact.comments && (
-                            <span className="text-xs sm:text-sm text-gray-600 truncate flex-1">
-                              {contact.comments}
-                            </span>
+                            <div 
+                              className="text-xs sm:text-sm text-gray-600 flex-1 cursor-pointer"
+                              onClick={() => {
+                                setShowingComments(prev => ({
+                                  ...prev,
+                                  [contact.id]: true
+                                }));
+                                setEditingComments(prev => ({
+                                  ...prev,
+                                  [contact.id]: contact.comments || ""
+                                }));
+                              }}
+                            >
+                              <div className="max-w-[150px] sm:max-w-[200px]">
+                                {contact.comments.length > 50 ? (
+                                  <span>
+                                    {contact.comments.substring(0, 50)}...
+                                  </span>
+                                ) : (
+                                  <span>{contact.comments}</span>
+                                )}
+                              </div>
+                            </div>
                           )}
                           {showingComments[contact.id] && (
                             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

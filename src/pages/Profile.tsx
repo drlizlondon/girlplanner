@@ -7,40 +7,62 @@ import { Camera } from "lucide-react";
 import { Header } from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/dataService";
 
 const Profile = () => {
   const [name, setName] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        navigate("/");
-        return;
-      }
+      const authenticated = await dataService.isUserAuthenticated();
+      setIsAuthenticated(authenticated);
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+      if (authenticated) {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
 
-      if (profile) {
-        setName(profile.user_name || "");
-        setPhotoUrl(profile.photo_url || "");
+          if (profile) {
+            setName(profile.user_name || "");
+            setPhotoUrl(profile.photo_url || "");
+          }
+        }
+      } else {
+        // Load from localStorage for local users
+        const localProfile = localStorage.getItem("localProfile");
+        if (localProfile) {
+          const profile = JSON.parse(localProfile);
+          setName(profile.name || "");
+          setPhotoUrl(profile.photoUrl || "");
+        }
       }
     };
 
     loadProfile();
-  }, [navigate]);
+  }, []);
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      if (!isAuthenticated) {
+        // For local users, just show a message that photo upload requires login
+        toast({
+          title: "Login required",
+          description: "Please log in to upload profile photos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('No user found');
@@ -88,18 +110,27 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
+      if (isAuthenticated) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('No user found');
 
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          user_name: name,
-          photo_url: photoUrl,
-        });
+        const { error } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            user_name: name,
+            photo_url: photoUrl,
+          });
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        // Save to localStorage for local users
+        const localProfile = {
+          name,
+          photoUrl
+        };
+        localStorage.setItem("localProfile", JSON.stringify(localProfile));
+      }
 
       toast({
         title: "Profile updated",
@@ -116,18 +147,25 @@ const Profile = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    if (isAuthenticated) {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+    } else {
+      toast({
+        title: "Going home",
+        description: "Returning to homepage.",
+      });
+    }
     navigate("/");
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <Header onSignOut={handleSignOut} />
+        <Header onSignOut={handleSignOut} showSignOut={true} />
         <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-dancing-script font-semibold text-gray-800">
