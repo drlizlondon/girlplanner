@@ -163,19 +163,20 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-2 sm:p-4 lg:p-8">
+      <div className="max-w-6xl mx-auto">
         <Header onSignOut={handleSignOut} showSignOut={true} />
-        <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-dancing-script font-semibold text-gray-800">
+        <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
+          <div className="text-center mb-4 sm:mb-6 lg:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 font-bold text-center pb-2">
               Welcome, {name || "Friend"}
             </h1>
+            <p className="text-center text-gray-600 text-sm sm:text-base">Manage your profile settings</p>
           </div>
 
-          <div className="space-y-8">
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100">
+          <div className="space-y-6 sm:space-y-8">
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-gray-100">
                 {photoUrl ? (
                   <img
                     src={photoUrl}
@@ -184,7 +185,8 @@ const Profile = () => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <Camera size={40} />
+                    <Camera size={32} className="sm:hidden" />
+                    <Camera size={40} className="hidden sm:block" />
                   </div>
                 )}
               </div>
@@ -198,19 +200,21 @@ const Profile = () => {
               <label htmlFor="photo-upload">
                 <Button
                   variant="outline"
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto text-xs sm:text-sm"
                   onClick={() => document.getElementById("photo-upload")?.click()}
                 >
-                  Upload Photo
+                  <Camera className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Upload Photo</span>
+                  <span className="sm:hidden">Upload</span>
                 </Button>
               </label>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2"
                 >
                   Name
                 </label>
@@ -219,14 +223,14 @@ const Profile = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full"
+                  className="w-full text-sm sm:text-base"
                 />
               </div>
             </div>
 
             <Button
               onClick={handleSave}
-              className="w-full bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white"
+              className="w-full bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white py-3 sm:py-4 text-sm sm:text-base"
             >
               Save Changes
             </Button>

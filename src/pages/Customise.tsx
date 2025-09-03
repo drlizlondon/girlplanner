@@ -121,48 +121,54 @@ const Customise = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-2 sm:p-4 lg:p-8">
+      <div className="max-w-6xl mx-auto">
         <Header onSignOut={handleSignOut} />
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
-          <h2 className="text-3xl font-dancing-script text-purple-700 font-bold text-center mb-6">
-            Customise Task Types
-          </h2>
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
+          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 font-bold text-center pb-2">
+              Customise Task Types
+            </h2>
+            <p className="text-center text-gray-600 text-sm sm:text-base">Manage your custom task categories</p>
+          </div>
           
-          <div className="space-y-6">
-            <div className="flex gap-4">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Input
                 placeholder="Add new task type..."
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="flex-1"
+                className="flex-1 text-sm sm:text-base"
               />
               <Button
                 onClick={handleAddType}
-                className="bg-gradient-to-r from-pink-400 to-purple-400"
+                className="bg-gradient-to-r from-pink-400 to-purple-400 w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Type
+                <span className="hidden sm:inline">Add Type</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {taskTypes.map((type) => (
-                <div key={type.id} className="flex items-center gap-4">
+                <div key={type.id} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   <Input
                     value={type.value}
                     onChange={(e) => handleUpdateType(type.id, e.target.value)}
-                    className="flex-1"
+                    className="flex-1 text-sm sm:text-base"
                     disabled={type.value === '_none'}
                   />
                   <Button
                     variant="destructive"
-                    size="icon"
+                    size="sm"
                     onClick={() => handleDeleteType(type.id)}
                     disabled={type.value === '_none'}
+                    className="w-full sm:w-auto"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 mr-2 sm:mr-0" />
+                    <span className="sm:hidden">Delete</span>
                   </Button>
                 </div>
               ))}
