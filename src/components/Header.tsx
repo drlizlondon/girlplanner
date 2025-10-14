@@ -73,9 +73,9 @@ export const Header = ({ onSignOut, showSignOut = true }: HeaderProps) => {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link to="/people">
+            <Link to="/people-to-contact">
               <Button
-                variant={isActive("/people") ? "default" : "ghost"}
+                variant={isActive("/people-to-contact") ? "default" : "ghost"}
                 className="font-normal"
               >
                 People to Contact
