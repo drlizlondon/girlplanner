@@ -408,6 +408,74 @@ export class DataService {
   getStorageType(): 'local' | 'supabase' {
     return this.isAuthenticated ? 'supabase' : 'local';
   }
+
+  // Opportunity operations
+  async getOpportunities(): Promise<any[]> {
+    if (this.isAuthenticated) {
+      const { data, error } = await supabase
+        .from('opportunities')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } else {
+      return localStorageAPI.getOpportunities();
+    }
+  }
+
+  async addOpportunity(title: string, deadline_date?: string, details?: string): Promise<any> {
+    if (this.isAuthenticated) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+      
+      const { data, error } = await supabase
+        .from('opportunities')
+        .insert([{
+          title,
+          deadline_date: deadline_date || null,
+          details: details || null,
+          user_id: user.id
+        }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } else {
+      return localStorageAPI.addOpportunity(title, deadline_date, details);
+    }
+  }
+
+  async updateOpportunity(opportunityId: string, updates: Partial<any>): Promise<any> {
+    if (this.isAuthenticated) {
+      const { data, error } = await supabase
+        .from('opportunities')
+        .update(updates)
+        .eq('id', opportunityId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } else {
+      return localStorageAPI.updateOpportunity(opportunityId, updates);
+    }
+  }
+
+  async deleteOpportunity(opportunityId: string): Promise<boolean> {
+    if (this.isAuthenticated) {
+      const { error } = await supabase
+        .from('opportunities')
+        .delete()
+        .eq('id', opportunityId);
+      
+      if (error) throw error;
+      return true;
+    } else {
+      return localStorageAPI.deleteOpportunity(opportunityId);
+    }
+  }
 }
 
 export const dataService = DataService.getInstance();

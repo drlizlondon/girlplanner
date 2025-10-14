@@ -73,6 +73,16 @@ export const Header = ({ onSignOut, showSignOut = true }: HeaderProps) => {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
+            <Link to="/opportunities">
+              <Button
+                variant={isActive("/opportunities") ? "default" : "ghost"}
+                className="font-normal"
+              >
+                Opportunities
+              </Button>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
             <Link to="/profile">
               <Button
                 variant={isActive("/profile") ? "default" : "ghost"}

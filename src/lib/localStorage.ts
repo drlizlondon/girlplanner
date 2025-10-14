@@ -5,6 +5,7 @@ const TASKS_KEY = "my-agenda-tasks";
 const COMPLETED_TASKS_KEY = "my-agenda-completed-tasks";
 const IDEAS_KEY = "my-agenda-ideas";
 const TASK_TYPES_KEY = "my-agenda-task-types";
+const OPPORTUNITIES_KEY = "my-agenda-opportunities";
 
 // Generate a simple UUID-like ID
 const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -46,6 +47,16 @@ interface TaskType {
   value: string;
 }
 
+// Opportunity interface for local storage
+interface LocalOpportunity {
+  id: string;
+  title: string;
+  deadline_date: string | null;
+  details: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // Initialize default data
 export const initializeLocalStorage = () => {
   if (!localStorage.getItem(TASK_TYPES_KEY)) {
@@ -59,6 +70,9 @@ export const initializeLocalStorage = () => {
   }
   if (!localStorage.getItem(IDEAS_KEY)) {
     localStorage.setItem(IDEAS_KEY, JSON.stringify([]));
+  }
+  if (!localStorage.getItem(OPPORTUNITIES_KEY)) {
+    localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify([]));
   }
 };
 
@@ -288,6 +302,53 @@ export const localStorageAPI = {
     const history = JSON.parse(localStorage.getItem('contact_history') || '[]');
     const updatedHistory = history.filter((h: any) => h.id !== historyId);
     localStorage.setItem('contact_history', JSON.stringify(updatedHistory));
+    return true;
+  },
+
+  // Opportunity operations
+  getOpportunities: (): LocalOpportunity[] => {
+    const data = localStorage.getItem(OPPORTUNITIES_KEY);
+    return data ? JSON.parse(data) : [];
+  },
+
+  addOpportunity: (title: string, deadline_date?: string, details?: string): LocalOpportunity => {
+    const opportunities = localStorageAPI.getOpportunities();
+    const newOpportunity: LocalOpportunity = {
+      id: generateId(),
+      title,
+      deadline_date: deadline_date || null,
+      details: details || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    
+    opportunities.unshift(newOpportunity);
+    localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(opportunities));
+    return newOpportunity;
+  },
+
+  updateOpportunity: (opportunityId: string, updates: Partial<LocalOpportunity>): LocalOpportunity | null => {
+    const opportunities = localStorageAPI.getOpportunities();
+    const opportunityIndex = opportunities.findIndex(o => o.id === opportunityId);
+    
+    if (opportunityIndex === -1) return null;
+    
+    opportunities[opportunityIndex] = { 
+      ...opportunities[opportunityIndex], 
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+    localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(opportunities));
+    return opportunities[opportunityIndex];
+  },
+
+  deleteOpportunity: (opportunityId: string): boolean => {
+    const opportunities = localStorageAPI.getOpportunities();
+    const filteredOpportunities = opportunities.filter(o => o.id !== opportunityId);
+    
+    if (filteredOpportunities.length === opportunities.length) return false;
+    
+    localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(filteredOpportunities));
     return true;
   }
 };
