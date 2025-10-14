@@ -222,7 +222,7 @@ const PeopleToContact = () => {
               className="w-full bg-gradient-to-r from-pink-400 to-purple-400"
             >
               <Plus className="h-4 w-4 mr-2" />
-              +add
+              + Add
             </Button>
           </div>
 

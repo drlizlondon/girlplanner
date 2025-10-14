@@ -8,9 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, User, Cloud, HardDrive, Trash2 } from "lucide-react";
+import { Check, User, Cloud, HardDrive, Trash2, Settings } from "lucide-react";
 import { Task, Priority } from "@/types/task";
-
+import { Link } from "react-router-dom";
 import { AuthModal } from "@/components/AuthModal";
 import { dataService } from "@/lib/dataService";
 import { CompletedTasksWrapper } from "@/components/CompletedTasksWrapper";
@@ -276,6 +276,19 @@ const Agenda = () => {
           )}
           
           {showCompleted && <CompletedTasksWrapper />}
+
+          {/* Customise Link */}
+          <div className="flex justify-center pt-4">
+            <Link to="/customise">
+              <Button
+                variant="link"
+                className="text-purple-600 hover:text-purple-700"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Customise Task Types
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
