@@ -119,7 +119,47 @@ const Agenda = () => {
                   </button>
                 </div>
               </TableCell>
-              <TableCell className="p-2 sm:p-4 text-xs sm:text-sm">{task.title}</TableCell>
+              <TableCell 
+                className="p-2 sm:p-4 text-xs sm:text-sm"
+                onDoubleClick={(e) => {
+                  const target = e.currentTarget;
+                  const currentText = task.title;
+                  
+                  const input = document.createElement('input');
+                  input.value = currentText;
+                  input.className = 'w-full px-2 py-1 text-xs sm:text-sm border rounded';
+                  
+                  target.innerHTML = '';
+                  target.appendChild(input);
+                  input.focus();
+                  input.select();
+                  
+                  const handleBlur = () => {
+                    const newValue = input.value.trim();
+                    if (newValue && newValue !== currentText) {
+                      updateTask(task.id, { title: newValue });
+                    }
+                    target.innerHTML = newValue || currentText;
+                    input.removeEventListener('blur', handleBlur);
+                    input.removeEventListener('keydown', handleKeyDown);
+                  };
+                  
+                  const handleKeyDown = (e: KeyboardEvent) => {
+                    if (e.key === 'Enter') {
+                      input.blur();
+                    } else if (e.key === 'Escape') {
+                      target.innerHTML = currentText;
+                      input.removeEventListener('blur', handleBlur);
+                      input.removeEventListener('keydown', handleKeyDown);
+                    }
+                  };
+                  
+                  input.addEventListener('blur', handleBlur);
+                  input.addEventListener('keydown', handleKeyDown);
+                }}
+              >
+                {task.title}
+              </TableCell>
               <TableCell className="p-2 sm:p-4">
                 <select
                   className={`w-full rounded-md border border-input bg-transparent px-2 py-1 text-xs sm:text-sm shadow-sm ${getPriorityColor(task.priority)}`}

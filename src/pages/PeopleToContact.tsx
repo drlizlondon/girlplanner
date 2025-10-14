@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, Plus, Trash2, Edit3 } from "lucide-react";
+import { Check, Plus, Trash2, History, User, Cloud, HardDrive } from "lucide-react";
 import { Header } from "@/components/Header";
 import { dataService } from "@/lib/dataService";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { AuthModal } from "@/components/AuthModal";
 
 interface Contact {
   id: string;
@@ -20,9 +21,10 @@ interface Contact {
 const PeopleToContact = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [newContactName, setNewContactName] = useState("");
-  const [editingComments, setEditingComments] = useState<{ [key: string]: string }>({});
-  const [showingComments, setShowingComments] = useState<{ [key: string]: boolean }>({});
+  const [newContactComments, setNewContactComments] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [storageType, setStorageType] = useState<'local' | 'supabase'>('local');
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -34,21 +36,24 @@ const PeopleToContact = () => {
   const checkAuthStatus = async () => {
     const authenticated = await dataService.isUserAuthenticated();
     setIsAuthenticated(authenticated);
+    setStorageType(dataService.getStorageType());
   };
 
-  const loadContacts = () => {
-    const savedContacts = localStorage.getItem("contacts");
-    if (savedContacts) {
-      setContacts(JSON.parse(savedContacts));
+  const loadContacts = async () => {
+    try {
+      const data = await dataService.getContacts();
+      setContacts(data);
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load contacts.",
+        variant: "destructive",
+      });
     }
   };
 
-  const saveContacts = (updatedContacts: Contact[]) => {
-    localStorage.setItem("contacts", JSON.stringify(updatedContacts));
-    setContacts(updatedContacts);
-  };
-
-  const addContact = () => {
+  const addContact = async () => {
     if (!newContactName.trim()) {
       toast({
         title: "Name required",
@@ -58,23 +63,23 @@ const PeopleToContact = () => {
       return;
     }
 
-    const newContact: Contact = {
-      id: Date.now().toString(),
-      name: newContactName.trim(),
-      comments: "",
-      contacted: false,
-      created_at: new Date().toISOString(),
-    };
-
-    const updatedContacts = [...contacts, newContact];
-    saveContacts(updatedContacts);
-    
-    setNewContactName("");
-    
-    toast({
-      title: "Contact added",
-      description: `${newContact.name} has been added to your contacts.`,
-    });
+    try {
+      await dataService.addContact(newContactName.trim(), newContactComments.trim());
+      loadContacts();
+      setNewContactName("");
+      setNewContactComments("");
+      toast({
+        title: "Contact added",
+        description: `${newContactName} has been added to your contacts.`,
+      });
+    } catch (error) {
+      console.error("Error adding contact:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add contact.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -83,38 +88,61 @@ const PeopleToContact = () => {
     }
   };
 
-  const updateComments = (contactId: string, comments: string) => {
-    const updatedContacts = contacts.map(contact =>
-      contact.id === contactId
-        ? { ...contact, comments }
-        : contact
-    );
-    saveContacts(updatedContacts);
+  const updateComments = async (contactId: string, comments: string) => {
+    try {
+      await dataService.updateContact(contactId, { comments });
+      loadContacts();
+    } catch (error) {
+      console.error("Error updating comments:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update comments.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const toggleContacted = (contactId: string) => {
-    const updatedContacts = contacts.map(contact =>
-      contact.id === contactId
-        ? { ...contact, contacted: !contact.contacted }
-        : contact
-    );
-    saveContacts(updatedContacts);
+  const markAsContacted = async (contactId: string) => {
+    try {
+      await dataService.markContactAsContacted(contactId);
+      loadContacts();
+      toast({
+        title: "Contact marked as contacted",
+        description: "Moved to history.",
+      });
+    } catch (error) {
+      console.error("Error marking as contacted:", error);
+      toast({
+        title: "Error",
+        description: "Failed to mark as contacted.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const deleteContact = (contactId: string) => {
-    const updatedContacts = contacts.filter(contact => contact.id !== contactId);
-    saveContacts(updatedContacts);
-    
-    toast({
-      title: "Contact deleted",
-      description: "Contact has been removed from your list.",
-    });
+  const deleteContact = async (contactId: string) => {
+    try {
+      await dataService.deleteContact(contactId);
+      loadContacts();
+      toast({
+        title: "Contact deleted",
+        description: "Contact has been removed from your list.",
+      });
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete contact.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSignOut = async () => {
     if (isAuthenticated) {
       await dataService.signOut();
       setIsAuthenticated(false);
+      setStorageType('local');
       toast({
         title: "Signed out",
         description: "You've been signed out.",
@@ -124,12 +152,50 @@ const PeopleToContact = () => {
     }
   };
 
+  const handleAuthSuccess = async () => {
+    const authenticated = await dataService.isUserAuthenticated();
+    setIsAuthenticated(authenticated);
+    setStorageType(dataService.getStorageType());
+    loadContacts();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-2 sm:p-4 lg:p-8">
       <div className="max-w-6xl mx-auto">
         <Header onSignOut={handleSignOut} showSignOut={isAuthenticated} />
 
         <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
+          {/* Storage Status */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-muted/50 rounded-lg p-3 sm:p-4 gap-2 sm:gap-0">
+            <div className="flex items-center gap-2">
+              {storageType === 'supabase' ? (
+                <>
+                  <Cloud className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Synced to Cloud</span>
+                  <span className="hidden sm:inline text-xs text-muted-foreground">(Your contacts are saved to your account)</span>
+                </>
+              ) : (
+                <>
+                  <HardDrive className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Local Storage</span>
+                  <span className="hidden sm:inline text-xs text-muted-foreground">(Contacts saved on this device only)</span>
+                </>
+              )}
+            </div>
+            {!isAuthenticated && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAuthModal(true)}
+                className="w-full sm:w-auto"
+              >
+                <User className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Sign In to Sync</span>
+                <span className="sm:hidden">Sign In</span>
+              </Button>
+            )}
+          </div>
+
           <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 font-bold text-center pb-2">
               People to Contact
@@ -138,21 +204,25 @@ const PeopleToContact = () => {
           </div>
 
           {/* Add Contact Form */}
-          <div className="flex gap-4 mb-8">
-            <div className="flex-1">
-              <Input
-                placeholder="Add a new contact..."
-                value={newContactName}
-                onChange={(e) => setNewContactName(e.target.value)}
-                onKeyPress={handleKeyPress}
-              />
-            </div>
+          <div className="space-y-3 mb-8">
+            <Input
+              placeholder="Name..."
+              value={newContactName}
+              onChange={(e) => setNewContactName(e.target.value)}
+              onKeyPress={handleKeyPress}
+            />
+            <Textarea
+              placeholder="Comment..."
+              value={newContactComments}
+              onChange={(e) => setNewContactComments(e.target.value)}
+              className="min-h-[80px] resize-none"
+            />
             <Button
               onClick={addContact}
-              className="bg-gradient-to-r from-pink-400 to-purple-400"
+              className="w-full bg-gradient-to-r from-pink-400 to-purple-400"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Contact
+              +add
             </Button>
           </div>
 
@@ -175,118 +245,27 @@ const PeopleToContact = () => {
                 </TableHeader>
                 <TableBody>
                   {contacts.map((contact) => (
-                    <TableRow key={contact.id} className={contact.contacted ? "opacity-60" : ""}>
+                    <TableRow key={contact.id}>
                       <TableCell className="p-2 sm:p-4">
                         <div className="flex items-center justify-center">
                           <button
-                            onClick={() => toggleContacted(contact.id)}
+                            onClick={() => markAsContacted(contact.id)}
                             className="h-4 w-4 sm:h-5 sm:w-5 rounded border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
                           >
                             <Check className="h-3 w-3 sm:h-4 sm:w-4 text-transparent hover:text-gray-400" />
                           </button>
                         </div>
                       </TableCell>
-                      <TableCell className={`p-2 sm:p-4 text-xs sm:text-sm ${contact.contacted ? "line-through" : ""}`}>
+                      <TableCell className="p-2 sm:p-4 text-xs sm:text-sm">
                         {contact.name}
                       </TableCell>
                       <TableCell className="p-2 sm:p-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => {
-                              setShowingComments(prev => ({
-                                ...prev,
-                                [contact.id]: true
-                              }));
-                              setEditingComments(prev => ({
-                                ...prev,
-                                [contact.id]: contact.comments || ""
-                              }));
-                            }}
-                            className="p-1 hover:bg-gray-100 rounded"
-                          >
-                            <Edit3 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
-                          </button>
-                          {contact.comments && (
-                            <div 
-                              className="text-xs sm:text-sm text-gray-600 flex-1 cursor-pointer"
-                              onClick={() => {
-                                setShowingComments(prev => ({
-                                  ...prev,
-                                  [contact.id]: true
-                                }));
-                                setEditingComments(prev => ({
-                                  ...prev,
-                                  [contact.id]: contact.comments || ""
-                                }));
-                              }}
-                            >
-                              <div className="max-w-[150px] sm:max-w-[200px]">
-                                {contact.comments.length > 50 ? (
-                                  <span>
-                                    {contact.comments.substring(0, 50)}...
-                                  </span>
-                                ) : (
-                                  <span>{contact.comments}</span>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          {showingComments[contact.id] && (
-                            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                              <div className="bg-white p-4 rounded-lg max-w-md w-full mx-4">
-                                <h3 className="font-medium mb-2">Edit Comments for {contact.name}</h3>
-                                <Textarea
-                                  value={editingComments[contact.id] || ""}
-                                  onChange={(e) => {
-                                    setEditingComments(prev => ({
-                                      ...prev,
-                                      [contact.id]: e.target.value
-                                    }));
-                                  }}
-                                  placeholder="Add comments..."
-                                  className="text-xs sm:text-sm min-h-[60px] resize-none mb-4"
-                                />
-                                <div className="flex gap-2 justify-end">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      setShowingComments(prev => ({
-                                        ...prev,
-                                        [contact.id]: false
-                                      }));
-                                      setEditingComments(prev => {
-                                        const newState = { ...prev };
-                                        delete newState[contact.id];
-                                        return newState;
-                                      });
-                                    }}
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => {
-                                      const newComments = editingComments[contact.id] || "";
-                                      updateComments(contact.id, newComments);
-                                      setShowingComments(prev => ({
-                                        ...prev,
-                                        [contact.id]: false
-                                      }));
-                                      setEditingComments(prev => {
-                                        const newState = { ...prev };
-                                        delete newState[contact.id];
-                                        return newState;
-                                      });
-                                    }}
-                                  >
-                                    Save
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        <Textarea
+                          value={contact.comments || ""}
+                          onChange={(e) => updateComments(contact.id, e.target.value)}
+                          placeholder="Add comments..."
+                          className="text-xs sm:text-sm min-h-[60px] resize-none"
+                        />
                       </TableCell>
                       <TableCell className="p-2 sm:p-4">
                         <Button
@@ -304,8 +283,26 @@ const PeopleToContact = () => {
               </Table>
             </div>
           )}
+
+          {/* History Link */}
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="link"
+              onClick={() => navigate("/contact-history")}
+              className="text-purple-600 hover:text-purple-700"
+            >
+              <History className="h-4 w-4 mr-2" />
+              View Contact History
+            </Button>
+          </div>
         </div>
       </div>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 };

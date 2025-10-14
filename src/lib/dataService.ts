@@ -242,6 +242,137 @@ export class DataService {
     }
   }
 
+  // Contact operations
+  async getContacts(): Promise<any[]> {
+    if (this.isAuthenticated) {
+      const { data, error } = await (supabase as any)
+        .from('contacts')
+        .select('*')
+        .eq('contacted', false)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } else {
+      return localStorageAPI.getContacts();
+    }
+  }
+
+  async addContact(name: string, comments?: string): Promise<any> {
+    if (this.isAuthenticated) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+      
+      const { data, error } = await (supabase as any)
+        .from('contacts')
+        .insert([{ name, comments: comments || '', contacted: false, user_id: user.id }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } else {
+      return localStorageAPI.addContact(name, comments);
+    }
+  }
+
+  async updateContact(contactId: string, updates: Partial<any>): Promise<any> {
+    if (this.isAuthenticated) {
+      const { data, error } = await (supabase as any)
+        .from('contacts')
+        .update(updates)
+        .eq('id', contactId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } else {
+      return localStorageAPI.updateContact(contactId, updates);
+    }
+  }
+
+  async markContactAsContacted(contactId: string): Promise<boolean> {
+    if (this.isAuthenticated) {
+      // Get the contact first
+      const { data: contact, error: fetchError } = await (supabase as any)
+        .from('contacts')
+        .select('*')
+        .eq('id', contactId)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      
+      // Add to history
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+      
+      const { error: historyError } = await (supabase as any)
+        .from('contact_history')
+        .insert([{
+          user_id: user.id,
+          name: contact.name,
+          comments: contact.comments,
+          created_at: contact.created_at
+        }]);
+      
+      if (historyError) throw historyError;
+      
+      // Delete from contacts
+      const { error: deleteError } = await (supabase as any)
+        .from('contacts')
+        .delete()
+        .eq('id', contactId);
+      
+      if (deleteError) throw deleteError;
+      return true;
+    } else {
+      return localStorageAPI.markContactAsContacted(contactId);
+    }
+  }
+
+  async deleteContact(contactId: string): Promise<boolean> {
+    if (this.isAuthenticated) {
+      const { error } = await (supabase as any)
+        .from('contacts')
+        .delete()
+        .eq('id', contactId);
+      
+      if (error) throw error;
+      return true;
+    } else {
+      return localStorageAPI.deleteContact(contactId);
+    }
+  }
+
+  async getContactHistory(): Promise<any[]> {
+    if (this.isAuthenticated) {
+      const { data, error } = await (supabase as any)
+        .from('contact_history')
+        .select('*')
+        .order('contacted_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } else {
+      return localStorageAPI.getContactHistory();
+    }
+  }
+
+  async deleteContactHistory(historyId: string): Promise<boolean> {
+    if (this.isAuthenticated) {
+      const { error } = await (supabase as any)
+        .from('contact_history')
+        .delete()
+        .eq('id', historyId);
+      
+      if (error) throw error;
+      return true;
+    } else {
+      return localStorageAPI.deleteContactHistory(historyId);
+    }
+  }
+
   // Auth methods
   async signIn(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({

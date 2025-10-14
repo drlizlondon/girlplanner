@@ -13,6 +13,7 @@ import Summary from "./pages/Summary";
 import Customise from "./pages/Customise";
 import GoodIdeas from "./pages/GoodIdeas";
 import PeopleToContact from "./pages/PeopleToContact";
+import ContactHistory from "./pages/ContactHistory";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +31,8 @@ const App = () => (
           <Route path="/summary" element={<Summary />} />
           <Route path="/customise" element={<Customise />} />
           <Route path="/ideas" element={<GoodIdeas />} />
-          <Route path="/people" element={<PeopleToContact />} />
+          <Route path="/people-to-contact" element={<PeopleToContact />} />
+          <Route path="/contact-history" element={<ContactHistory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
