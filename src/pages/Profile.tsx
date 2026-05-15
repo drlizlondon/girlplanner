@@ -28,8 +28,8 @@ const Profile = () => {
           const { data: profile } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', user.id)
-            .single();
+            .eq('user_id', user.id)
+            .maybeSingle();
 
           if (profile) {
             setName(profile.user_name || "");
@@ -83,13 +83,13 @@ const Profile = () => {
         setPhotoUrl(publicUrl);
 
         // Update profile with new photo URL
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from('profiles')
           .upsert({
-            id: user.id,
+            user_id: user.id,
             photo_url: publicUrl,
             user_name: name
-          });
+          }, { onConflict: 'user_id' });
 
         if (updateError) throw updateError;
 
@@ -114,13 +114,13 @@ const Profile = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('No user found');
 
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('profiles')
           .upsert({
-            id: user.id,
+            user_id: user.id,
             user_name: name,
             photo_url: photoUrl,
-          });
+          }, { onConflict: 'user_id' });
 
         if (error) throw error;
       } else {

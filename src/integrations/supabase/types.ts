@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      briefing_suggestions: {
+        Row: {
+          briefing_id: string
+          created_at: string
+          description: string | null
+          id: string
+          position: number | null
+          priority: string | null
+          project: string | null
+          source_section: string | null
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          briefing_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number | null
+          priority?: string | null
+          project?: string | null
+          source_section?: string | null
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          briefing_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number | null
+          priority?: string | null
+          project?: string | null
+          source_section?: string | null
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefing_suggestions_briefing_id_fkey"
+            columns: ["briefing_id"]
+            isOneToOne: false
+            referencedRelation: "daily_briefings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_history: {
         Row: {
           comments: string | null
@@ -66,6 +122,51 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_briefings: {
+        Row: {
+          briefing_date: string
+          created_at: string
+          executive_signals: string | null
+          id: string
+          open_questions: Json | null
+          overview: string | null
+          parked_ideas: Json | null
+          project_updates: Json | null
+          raw_text: string
+          strategic_insights: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          briefing_date?: string
+          created_at?: string
+          executive_signals?: string | null
+          id?: string
+          open_questions?: Json | null
+          overview?: string | null
+          parked_ideas?: Json | null
+          project_updates?: Json | null
+          raw_text: string
+          strategic_insights?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          briefing_date?: string
+          created_at?: string
+          executive_signals?: string | null
+          id?: string
+          open_questions?: Json | null
+          overview?: string | null
+          parked_ideas?: Json | null
+          project_updates?: Json | null
+          raw_text?: string
+          strategic_insights?: Json | null
           updated_at?: string
           user_id?: string
         }

@@ -75,7 +75,7 @@ export class DataService {
 
   async updateTask(taskId: string, updates: Partial<any>): Promise<any> {
     if (this.isAuthenticated) {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('tasks')
         .update(updates)
         .eq('id', taskId)
@@ -168,10 +168,10 @@ export class DataService {
 
   async getTaskTypes(): Promise<any[]> {
     if (this.isAuthenticated) {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('task_types')
         .select('*')
-        .order('value');
+        .order('title');
       
       if (error) throw error;
       return data || [];
@@ -214,7 +214,7 @@ export class DataService {
 
   async updateIdea(ideaId: string, updates: Partial<any>): Promise<any> {
     if (this.isAuthenticated) {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('ideas')
         .update(updates)
         .eq('id', ideaId)
@@ -449,7 +449,7 @@ export class DataService {
 
   async updateOpportunity(opportunityId: string, updates: Partial<any>): Promise<any> {
     if (this.isAuthenticated) {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('opportunities')
         .update(updates)
         .eq('id', opportunityId)
