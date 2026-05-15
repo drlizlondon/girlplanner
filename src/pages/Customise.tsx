@@ -9,7 +9,7 @@ import { useState, useEffect, KeyboardEvent } from "react";
 
 interface TaskTypeOption {
   id: string;
-  value: string;
+  value: string; // mapped from `title` column
 }
 
 const Customise = () => {
@@ -23,10 +23,10 @@ const Customise = () => {
   }, []);
 
   const fetchTaskTypes = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('task_types')
       .select('*')
-      .order('value', { ascending: true });
+      .order('title', { ascending: true });
 
     if (error) {
       toast({
@@ -36,15 +36,16 @@ const Customise = () => {
       return;
     }
 
-    setTaskTypes(data || []);
+    setTaskTypes((data || []).map((t: any) => ({ id: t.id, value: t.title })));
   };
 
   const handleAddType = async () => {
     if (!newType.trim()) return;
-
-    const { error } = await supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await (supabase as any)
       .from('task_types')
-      .insert([{ value: newType.trim() }]);
+      .insert([{ title: newType.trim(), user_id: user.id }]);
 
     if (error) {
       toast({
@@ -70,9 +71,9 @@ const Customise = () => {
   };
 
   const handleUpdateType = async (id: string, newValue: string) => {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('task_types')
-      .update({ value: newValue })
+      .update({ title: newValue })
       .eq('id', id);
 
     if (error) {
