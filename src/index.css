@@ -154,7 +154,7 @@
 @layer components {
   .glow-card {
     background: var(--gradient-card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
     border-radius: var(--radius);
     color: var(--text);
@@ -164,7 +164,7 @@
 
   .surface-soft {
     background: var(--card-soft);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius);
   }
 
