@@ -1,481 +1,85 @@
 import { Task } from "@/types/task";
-import { supabase } from "@/integrations/supabase/client";
-import { localStorageAPI, initializeLocalStorage } from "./localStorage";
+import {
+  initStore,
+  TasksStore,
+  IdeasStore,
+  OppStore,
+  PeopleStore,
+  TaskTypesStore,
+} from "./localStore";
 
-// Data service that automatically switches between localStorage and Supabase
+/**
+ * Founder OS is local-first. This service preserves the previous async
+ * API surface so existing hooks/pages keep working, but every call now
+ * reads/writes localStorage via the namespaced stores in localStore.ts.
+ *
+ * Cloud sync is intentionally not wired here in this pass.
+ */
 export class DataService {
   private static instance: DataService;
-  private isAuthenticated = false;
+  private initialised = false;
 
   static getInstance(): DataService {
-    if (!DataService.instance) {
-      DataService.instance = new DataService();
-    }
+    if (!DataService.instance) DataService.instance = new DataService();
     return DataService.instance;
   }
 
   async initialize(): Promise<void> {
-    // Check if user is authenticated
-    const { data: { user } } = await supabase.auth.getUser();
-    this.isAuthenticated = !!user;
-    
-    // If not authenticated, initialize localStorage
-    if (!this.isAuthenticated) {
-      initializeLocalStorage();
-    }
+    if (this.initialised) return;
+    initStore();
+    this.initialised = true;
   }
 
   async isUserAuthenticated(): Promise<boolean> {
-    const { data: { user } } = await supabase.auth.getUser();
-    this.isAuthenticated = !!user;
-    return this.isAuthenticated;
+    return false;
   }
 
-  // Task operations that auto-switch between storage methods
-  async getTasks(): Promise<any[]> {
-    if (this.isAuthenticated) {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('completed', false)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } else {
-      return localStorageAPI.getTasks();
-    }
+  getStorageType(): "local" | "supabase" {
+    return "local";
   }
 
-  async addTask(title: string): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert([{
-          title,
-          type: '_none',
-          priority: 'low',
-          additional_info: '',
-          thoughts: '',
-          completed: false,
-          user_id: user.id
-        }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.addTask(title);
-    }
-  }
+  // ---- Tasks ----
+  async getTasks() { return TasksStore.all(); }
+  async addTask(title: string) { return TasksStore.add(title); }
+  async updateTask(id: string, patch: Partial<any>) { return TasksStore.update(id, patch); }
+  async completeTask(id: string) { return TasksStore.complete(id); }
+  async deleteTask(id: string) { return TasksStore.remove(id); }
+  async getCompletedTasks() { return TasksStore.completed(); }
+  async deleteCompletedTask(id: string) { return TasksStore.removeCompleted(id); }
+  async revertTask(id: string) { return TasksStore.revert(id); }
+  async getTaskTypes() { return TaskTypesStore.all(); }
 
-  async updateTask(taskId: string, updates: Partial<any>): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data, error } = await (supabase as any)
-        .from('tasks')
-        .update(updates)
-        .eq('id', taskId)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.updateTask(taskId, updates);
-    }
-  }
+  // ---- Ideas ----
+  async getIdeas() { return IdeasStore.all(); }
+  async addIdea(title: string) { return IdeasStore.add(title); }
+  async updateIdea(id: string, patch: Partial<any>) { return IdeasStore.update(id, patch); }
+  async deleteIdea(id: string) { return IdeasStore.remove(id); }
 
-  async completeTask(taskId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ 
-          completed: true, 
-          completed_at: new Date().toISOString() 
-        })
-        .eq('id', taskId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.completeTask(taskId);
-    }
-  }
+  // ---- Contacts / People ----
+  async getContacts() { return PeopleStore.all(); }
+  async addContact(name: string, comments?: string) { return PeopleStore.add(name, comments || ""); }
+  async updateContact(id: string, patch: Partial<any>) { return PeopleStore.update(id, patch); }
+  async markContactAsContacted(id: string) { return PeopleStore.markContacted(id); }
+  async deleteContact(id: string) { return PeopleStore.remove(id); }
+  async getContactHistory() { return PeopleStore.history(); }
+  async deleteContactHistory(id: string) { return PeopleStore.removeHistory(id); }
 
-  async deleteTask(taskId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', taskId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.deleteTask(taskId);
-    }
+  // ---- Opportunities ----
+  async getOpportunities() { return OppStore.all(); }
+  async addOpportunity(title: string, deadline?: string, details?: string) {
+    return OppStore.add(title, deadline, details);
   }
+  async updateOpportunity(id: string, patch: Partial<any>) { return OppStore.update(id, patch); }
+  async deleteOpportunity(id: string) { return OppStore.remove(id); }
 
-  async getCompletedTasks(): Promise<any[]> {
-    if (this.isAuthenticated) {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('completed', true)
-        .order('completed_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } else {
-      return localStorageAPI.getCompletedTasks();
-    }
+  // ---- Auth (no-op stubs for legacy callers) ----
+  async signIn(_email: string, _password: string) {
+    return { data: null, error: new Error("Founder OS is local-only. Sign in is disabled.") };
   }
-
-  async deleteCompletedTask(taskId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', taskId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.deleteCompletedTask(taskId);
-    }
+  async signUp(_email: string, _password: string) {
+    return { data: null, error: new Error("Founder OS is local-only. Sign up is disabled.") };
   }
-
-  async revertTask(taskId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ 
-          completed: false, 
-          completed_at: null 
-        })
-        .eq('id', taskId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.revertTask(taskId);
-    }
-  }
-
-  async getTaskTypes(): Promise<any[]> {
-    if (this.isAuthenticated) {
-      const { data, error } = await (supabase as any)
-        .from('task_types')
-        .select('*')
-        .order('title');
-      
-      if (error) throw error;
-      return data || [];
-    } else {
-      return localStorageAPI.getTaskTypes();
-    }
-  }
-
-  async getIdeas(): Promise<any[]> {
-    if (this.isAuthenticated) {
-      const { data, error } = await supabase
-        .from('ideas')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } else {
-      return localStorageAPI.getIdeas();
-    }
-  }
-
-  async addIdea(title: string): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
-        .from('ideas')
-        .insert([{ title, details: '', user_id: user.id }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.addIdea(title);
-    }
-  }
-
-  async updateIdea(ideaId: string, updates: Partial<any>): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data, error } = await (supabase as any)
-        .from('ideas')
-        .update(updates)
-        .eq('id', ideaId)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.updateIdea(ideaId, updates);
-    }
-  }
-
-  async deleteIdea(ideaId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await supabase
-        .from('ideas')
-        .delete()
-        .eq('id', ideaId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.deleteIdea(ideaId);
-    }
-  }
-
-  // Contact operations
-  async getContacts(): Promise<any[]> {
-    if (this.isAuthenticated) {
-      const { data, error } = await (supabase as any)
-        .from('contacts')
-        .select('*')
-        .eq('contacted', false)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } else {
-      return localStorageAPI.getContacts();
-    }
-  }
-
-  async addContact(name: string, comments?: string): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-      
-      const { data, error } = await (supabase as any)
-        .from('contacts')
-        .insert([{ name, comments: comments || '', contacted: false, user_id: user.id }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.addContact(name, comments);
-    }
-  }
-
-  async updateContact(contactId: string, updates: Partial<any>): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data, error } = await (supabase as any)
-        .from('contacts')
-        .update(updates)
-        .eq('id', contactId)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.updateContact(contactId, updates);
-    }
-  }
-
-  async markContactAsContacted(contactId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      // Get the contact first
-      const { data: contact, error: fetchError } = await (supabase as any)
-        .from('contacts')
-        .select('*')
-        .eq('id', contactId)
-        .single();
-      
-      if (fetchError) throw fetchError;
-      
-      // Add to history
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-      
-      const { error: historyError } = await (supabase as any)
-        .from('contact_history')
-        .insert([{
-          user_id: user.id,
-          name: contact.name,
-          comments: contact.comments,
-          created_at: contact.created_at
-        }]);
-      
-      if (historyError) throw historyError;
-      
-      // Delete from contacts
-      const { error: deleteError } = await (supabase as any)
-        .from('contacts')
-        .delete()
-        .eq('id', contactId);
-      
-      if (deleteError) throw deleteError;
-      return true;
-    } else {
-      return localStorageAPI.markContactAsContacted(contactId);
-    }
-  }
-
-  async deleteContact(contactId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await (supabase as any)
-        .from('contacts')
-        .delete()
-        .eq('id', contactId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.deleteContact(contactId);
-    }
-  }
-
-  async getContactHistory(): Promise<any[]> {
-    if (this.isAuthenticated) {
-      const { data, error } = await (supabase as any)
-        .from('contact_history')
-        .select('*')
-        .order('contacted_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } else {
-      return localStorageAPI.getContactHistory();
-    }
-  }
-
-  async deleteContactHistory(historyId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await (supabase as any)
-        .from('contact_history')
-        .delete()
-        .eq('id', historyId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.deleteContactHistory(historyId);
-    }
-  }
-
-  // Auth methods
-  async signIn(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (!error) {
-      this.isAuthenticated = true;
-    }
-    
-    return { data, error };
-  }
-
-  async signUp(email: string, password: string) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`
-      }
-    });
-    
-    return { data, error };
-  }
-
-  async signOut() {
-    const { error } = await supabase.auth.signOut();
-    this.isAuthenticated = false;
-    return { error };
-  }
-
-  getStorageType(): 'local' | 'supabase' {
-    return this.isAuthenticated ? 'supabase' : 'local';
-  }
-
-  // Opportunity operations
-  async getOpportunities(): Promise<any[]> {
-    if (this.isAuthenticated) {
-      const { data, error } = await supabase
-        .from('opportunities')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } else {
-      return localStorageAPI.getOpportunities();
-    }
-  }
-
-  async addOpportunity(title: string, deadline_date?: string, details?: string): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
-        .from('opportunities')
-        .insert([{
-          title,
-          deadline_date: deadline_date || null,
-          details: details || null,
-          user_id: user.id
-        }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.addOpportunity(title, deadline_date, details);
-    }
-  }
-
-  async updateOpportunity(opportunityId: string, updates: Partial<any>): Promise<any> {
-    if (this.isAuthenticated) {
-      const { data, error } = await (supabase as any)
-        .from('opportunities')
-        .update(updates)
-        .eq('id', opportunityId)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    } else {
-      return localStorageAPI.updateOpportunity(opportunityId, updates);
-    }
-  }
-
-  async deleteOpportunity(opportunityId: string): Promise<boolean> {
-    if (this.isAuthenticated) {
-      const { error } = await supabase
-        .from('opportunities')
-        .delete()
-        .eq('id', opportunityId);
-      
-      if (error) throw error;
-      return true;
-    } else {
-      return localStorageAPI.deleteOpportunity(opportunityId);
-    }
-  }
+  async signOut() { return { error: null }; }
 }
 
 export const dataService = DataService.getInstance();
