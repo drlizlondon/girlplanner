@@ -12,13 +12,13 @@
 
 @layer base {
   :root, [data-theme="night"] {
-    /* Founder OS tokens */
+    /* Founder OS tokens (raw) */
     --bg: #080912;
     --card: #12131F;
     --card-soft: #191A29;
     --text: #F7F3FF;
     --text-muted: #A9A3B8;
-    --border: #2A2440;
+    --border-color: #2A2440;
     --input-bg: #090A12;
     --input-text: #F7F3FF;
     --accent: #B56CFF;
@@ -50,7 +50,7 @@
     --accent-foreground: 270 90% 90%;
     --destructive: 348 100% 68%;
     --destructive-foreground: 264 70% 98%;
-    --border-hsl: 263 30% 20%;
+    --border: 263 30% 20%;
     --border-subtle: 263 24% 14%;
     --input: 263 30% 20%;
     --ring: 273 100% 71%;
@@ -76,7 +76,7 @@
     --card-soft: #F8F3FA;
     --text: #17131F;
     --text-muted: #6B6575;
-    --border: #E7DDF0;
+    --border-color: #E7DDF0;
     --input-bg: #FFFFFF;
     --input-text: #17131F;
     --accent: #9B3FE8;
@@ -105,7 +105,7 @@
     --accent-foreground: 0 0% 100%;
     --destructive: 340 70% 52%;
     --destructive-foreground: 0 0% 100%;
-    --border-hsl: 286 44% 90%;
+    --border: 286 44% 90%;
     --border-subtle: 286 40% 92%;
     --input: 286 44% 90%;
     --ring: 278 79% 56%;
@@ -125,10 +125,6 @@
     --shadow-soft: var(--shadow);
   }
 
-  /* Map shadcn's bare token names to our themed values */
-  :root, [data-theme] {
-    --border: var(--border-hsl);
-  }
 }
 
 @layer base {
@@ -140,7 +136,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; }
 
-  * { border-color: hsl(var(--border-hsl)); }
+  * { border-color: hsl(var(--border)); }
 
   body {
     background-color: var(--bg);
