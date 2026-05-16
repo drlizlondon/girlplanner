@@ -56,8 +56,7 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
 
   if (suggestion.status !== "pending") {
     const label =
-      suggestion.status === "accepted" ? "Added to Agenda" :
-      suggestion.status === "saved" ? "Saved" : "Archived";
+      suggestion.status === "accepted" ? "Committed" : "Archived";
     return (
       <div className="glow-card p-4 opacity-60">
         <div className="flex items-center justify-between gap-3">
@@ -82,8 +81,8 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
               {suggestion.project}
             </span>
           )}
-          {suggestion.source_section && (
-            <span className="text-[10px] text-muted-foreground/70">from {suggestion.source_section}</span>
+          {suggestion.target_section && (
+            <span className="text-[10px] text-muted-foreground/70">from {suggestion.target_section}</span>
           )}
         </div>
         <button
