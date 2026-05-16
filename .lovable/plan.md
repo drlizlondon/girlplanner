@@ -1,118 +1,101 @@
-# Founder OS Command Centre — Implementation Plan
+# Founder OS — Local-First Implementation Pass
 
-This is a large redesign. I'll break it into phases so you can review the direction before I build everything. The core principle throughout: **the Agenda is the trusted system; nothing auto-creates tasks.**
+This pass keeps the existing cinematic visual identity but rebuilds the foundation around: local-only mode, day/night themes, mobile-first layout, manual ChatGPT bridge, and a config-driven template structure.
 
----
+## 1. Config + theme foundation
 
-## Phase 1 — Foundation (design system + navigation shell)
+**New files**
+- `src/config/founderOS.ts` — central `founderOSConfig` (systemName, storageMode, sections, accentColour, tone, prompts).
+- `src/lib/storageKeys.ts` — namespaced `founderOS.*` keys + helpers.
+- `src/lib/theme.ts` + `src/hooks/useTheme.tsx` — provider managing `"day" | "night" | "system"`, persisted to `founderOS.theme`, applies `data-theme` to `<html>`.
 
-**Visual language**
-- Switch to a cinematic dark theme as the default: deep navy/charcoal background, soft purple accents, subtle glow cards, generous whitespace.
-- Update `index.css` and `tailwind.config.ts` with new semantic tokens (background, surface, surface-elevated, border-subtle, accent, accent-glow, text-primary/secondary/muted).
-- Premium typography: keep Dancing Script only for the wordmark; switch body/UI to a clean sans (Inter / Geist-like) with tighter tracking.
-- Card primitives: rounded-2xl, soft inner border, subtle radial glow on hover, no harsh shadows.
+**index.css**
+- Replace existing HSL token block with the requested raw CSS variables (`--bg`, `--card`, `--card-soft`, `--text`, `--text-muted`, `--border`, `--input-bg`, `--input-text`, `--accent`, `--accent-gradient`, `--button-text`, `--shadow`) under `[data-theme="day"]` and `[data-theme="night"]`.
+- Keep a thin shadcn compatibility layer: map shadcn semantic tokens (`--background`, `--foreground`, `--card`, `--primary`, `--border`, `--input`, `--muted`, `--sidebar-*`, etc.) to the new vars via HSL approximations so existing shadcn components continue to render correctly under both themes.
+- Mobile typography utilities using `clamp()` for page/section/body sizes.
+- `html, body, #root { width: 100%; max-width: 100vw; overflow-x: hidden; box-sizing: border-box; }`.
 
-**App shell**
-- Replace the top horizontal nav with a left sidebar using shadcn `Sidebar` (collapsible to icon mini-rail).
-- Sidebar items: Command Centre, Agenda, Processing Inbox, Projects, Ideas, Opportunities, Calendar, People, Archive, Search.
-- Sidebar shows active route, user avatar at bottom, sign-in/out.
-- Wrap all routes in a single `AppLayout` with `SidebarProvider`.
+## 2. Mobile layout fixes
 
----
+- `AppLayout`: main wrapper `min-w-0 overflow-x-hidden`, mobile horizontal padding 20px, bottom padding 120px, header height tightened on mobile (sidebar trigger left, storage chip right).
+- `AppSidebar`: mobile drawer width `min(82vw, 340px)`.
+- Replace ad-hoc `max-w-*` containers in `CommandCentre`, `ProcessingInbox`, `BriefingView`, `Agenda`, `Opportunities`, `GoodIdeas`, `PeopleToContact` with a shared `<PageShell>` component that enforces the responsive padding/width rules.
+- Stats / metric cards → 4-col desktop, 2-col tablet, 1-col under 390px (`grid-cols-1 min-[391px]:grid-cols-2 md:grid-cols-4 gap-3.5`).
+- Task rows: `whitespace-normal break-words [overflow-wrap:anywhere]`, remove fixed widths.
+- Tables in Opportunities / People → card layout under `md`.
 
-## Phase 2 — Database (Lovable Cloud)
+## 3. Local-Only mode
 
-Two new tables with RLS (user-scoped):
+- `dataService.initialize()` no longer requires auth; always falls back to local. Cloud sync becomes opt-in (kept under the hood but not surfaced as the default).
+- Remove the large Sign In / Local Storage promo panel from the dashboard.
+- All section hooks (`useTasks`, `useOpportunities`, ideas, contacts, briefings, suggestions) read/write namespaced `founderOS.*` keys via a new `localStore` utility.
+- Briefings + suggestions migrated from Supabase-only to local-first: `founderOS.processingInbox`, `founderOS.chatgptImports`, `founderOS.pendingSuggestions`, `founderOS.archivedSuggestions`, `founderOS.archive`.
 
-**`daily_briefings`** — date, raw_text, overview, executive_signals, project_updates (jsonb), strategic_insights (jsonb), open_questions (jsonb), parked_ideas (jsonb).
+## 4. Settings page (`/settings`)
 
-**`briefing_suggestions`** — briefing_id, type (`priority_action` | `follow_up` | `insight` | `question` | `idea`), title, description, project, priority, source_section, status (`pending` | `accepted` | `saved` | `archived`).
+New `src/pages/Settings.tsx` with:
+- **Theme** — Day / Night / System segmented control.
+- **Storage** — Current mode: Local-Only · Data location · Sync Off · No account required · Last export date · App version.
+- **Data** — Export JSON (`founder-os-backup-YYYY-MM-DD.json`), Import JSON (validated), Clear local data (confirm modal).
+- Copy: "Local-Only Mode keeps your data on this device. Export regularly if you want a backup."
 
-Existing tables (tasks, ideas, opportunities, contacts, profiles, task_types) stay as-is. New `projects` field on suggestions is just text for now — Projects page in a later phase will formalise it.
+`src/lib/backup.ts` — `exportAll()` / `importAll(json)` covering every namespaced key, with schema check.
 
----
+## 5. Section quick capture + review controls
 
-## Phase 3 — Processing Inbox page (`/inbox`)
+Shared `<QuickCapture placeholder onSubmit />` component used by Agenda, People, Projects, Ideas, Opportunities, Processing Inbox. Saved items expose Edit / Save / Archive / Delete with a confirm dialog on delete ("Delete this item? This cannot be undone.").
 
-**Top:** Title "Processing Inbox" + subtitle "Paste a daily report and decide what deserves to become part of your system."
+Stub `Projects` page wired to `founderOS.projects` so the section list matches config.
 
-**Paste box:** large premium textarea, placeholder "Paste Daily Executive Processing report…", single primary button "Create Briefing".
+## 6. Manual ChatGPT bridge
 
-**Deterministic parser** (no AI): splits the markdown by `##` / `###` headings, recognising:
-- Overview
-- Executive Signals
-- Priority Actions → suggestion cards (type=priority_action)
-- Possible Follow Ups → suggestion cards (type=follow_up)
-- Project Updates → grouped by project sub-heading
-- Strategic Insights → suggestion cards (type=insight)
-- Open Questions → suggestion cards (type=question)
-- Parked Ideas → suggestion cards (type=idea)
+**Agenda selection**
+- Add checkbox column to task rows, `Select all visible` / `Deselect all` / `Export selected to ChatGPT` toolbar that appears when ≥1 selected.
 
-Bullet items under each section become individual suggestion rows. Project tags inferred from `[BishBash]`-style brackets or sub-headings.
+**Export modal** (`src/components/chatgpt/ExportModal.tsx`)
+- Builds the exact `FOUNDER_OS_CHATGPT_EXPORT` block from the spec, shows selected task count, Copy button (writes to clipboard + toast), saves to `founderOS.chatgptExports`.
 
-**After submission** the page renders the saved briefing:
+**Import area** (`src/pages/ProcessingInbox.tsx` gains an "Import from ChatGPT" tab)
+- Parser `src/lib/chatgptBridge.ts`:
+  - `buildExport(tasks)` → string.
+  - `parseReturn(text)` → array of suggestion objects. Detects `FOUNDER_OS_CHATGPT_RETURN`, splits on `TASK_RESPONSE` / `END_TASK_RESPONSE`, extracts fields.
+  - On parse failure: gentle error toast + raw text saved to Processing Inbox.
+- Each parsed item becomes a row in `founderOS.pendingSuggestions` with original task linkage.
 
-1. **Executive Summary card** — editorial layout, date + overview + signals, calm and readable.
-2. **Priority Actions** — review cards with priority pill, title, project tag, editable description, source section. Buttons: *Add to Agenda*, *Edit*, *Archive*, *Save as Idea*.
-3. **Follow Ups** — softer cards. Buttons: *Convert to Task*, *Save for Later*, *Archive*.
-4. **Project Updates** — grouped by project, each card lists updates + next steps + linked actions/ideas.
-5. **Strategic Insights** — softer visual weight, expandable. Buttons: *Save*, *Link to Project*, *Archive*.
-6. **Open Questions** — expandable thinking-prompt cards.
-7. **Parked Ideas** — Idea Vault cards. Buttons: *Save Idea*, *Expand Later*, *Convert to Project*, *Archive*.
+**Review screen** (`src/pages/Review.tsx`, also embedded in Processing Inbox)
+- Tabs: Pending · Accepted · Archived.
+- Suggestion card shows original task, recommendation, next actions, draft text, target section, status, type badge.
+- Actions: Accept (commits to target section via dataService, moves to Accepted), Edit (inline), Archive (moves to `founderOS.archivedSuggestions`), Delete (confirm).
+- Mobile-first: cards stack, compact action row.
 
-**Critical:** every action is manual. "Add to Agenda" inserts into `tasks`, marks suggestion `accepted`, leaves the briefing intact.
+## 7. Search + Archive
 
----
+- `src/pages/Search.tsx` — single input, filters across all `founderOS.*` collections client-side, grouped results by section, click jumps to source.
+- `src/pages/Archive.tsx` — filter tabs by type (Tasks, Ideas, Opportunities, People, Suggestions, Briefings); restore / delete actions.
 
-## Phase 4 — Command Centre (`/`)
+## 8. Visual clean-up
 
-Replaces the current Index landing flow for signed-in users. Agenda-first.
+- Single `<Button>` variant policy: `primary` uses `--accent-gradient`, `secondary` uses `--card-soft`, `ghost` plain. Remove duplicated "+ + Add" labels.
+- Inputs: `bg-[--input-bg] text-[--input-text] border-[--border]` so they're never black in Day Mode.
+- Consistent radius `var(--radius)` (~14px small / 22px hero), shadow `var(--shadow)`.
+- Script font (`Instrument Serif`) only on page titles.
 
-**Top strip** (small, calm metric chips, not a dashboard wall): Today's Tasks · Overdue · Follow Ups · Meetings.
+## 9. Routing
 
-**Hero — Today's Agenda** (dominates the page):
-- Sections: Today, This Week, Overdue, Completed (collapsible, visually minimised).
-- Inline-edit titles, due dates, project tags, priority.
-- Drag-and-drop reordering within a section (using `@dnd-kit` — already light, no heavy deps).
-- Fast keyboard-friendly "+ add task" row at top of Today.
+`App.tsx` routes wrapped in `AppLayout`:
+`/` Command Centre · `/agenda` · `/people` · `/projects` · `/ideas` · `/opportunities` · `/inbox` (Processing) · `/review` · `/search` · `/archive` · `/settings`. Sidebar items derive from `founderOSConfig.sections` + utility links.
 
-**Right sidebar — Processing Review** (secondary, muted):
-- Suggested Actions (pending priority_action suggestions across recent briefings)
-- Interesting Ideas
-- Follow Ups
-- Opportunities
-- Each row links into the relevant briefing/page. Visual treatment makes clear these are *optional*, not commitments.
+## 10. Acceptance verification
 
----
+- Manual viewport check at 390 / 430 / 768 / 1280.
+- Verify: no horizontal scroll, themes persist after refresh, export round-trips through import, ChatGPT export+return parses, suggestion lifecycle works, dashboard renders with no account.
 
-## Phase 5 — Briefing Archive (`/inbox/archive`)
+## Out of scope (explicit)
 
-List previous briefings by date with summary preview, accepted-task count, saved-idea count, archived count. Click → full briefing view (same component as post-submission view).
+No OpenAI API, no automatic AI, no cloud-only features added, no auth-gating of core flows, no subscriptions, no collaboration. Existing Supabase tables remain but become an optional sync layer (not enabled by default in this pass).
 
----
+## Notes for non-technical readers
 
-## Phase 6 — Stub pages for new sidebar entries
-
-To keep the nav coherent without scope-creeping, these get minimal placeholder pages this round:
-- Projects, Calendar, Archive, Search → "Coming soon" with consistent styling.
-- Ideas, Opportunities, People → wire existing pages (`GoodIdeas`, `Opportunities`, `PeopleToContact`) into the new shell.
-
----
-
-## Technical notes
-
-- New deps: `@dnd-kit/core` + `@dnd-kit/sortable` for agenda DnD.
-- Parser lives in `src/lib/briefingParser.ts`, pure function, unit-testable.
-- Suggestion → task conversion goes through existing `dataService` so it works in both local and cloud modes. (Briefings themselves are cloud-only since they're a new table; signed-out users see a "Sign in to use Processing Inbox" prompt.)
-- All colours via semantic tokens — no raw hex in components.
-- Header component is replaced by the sidebar; old `Header` removed from pages.
-
----
-
-## What I'd like to confirm before building
-
-1. **Scope of this round** — happy to ship Phases 1–5 in this pass and leave Projects/Calendar/Archive/Search as styled stubs (Phase 6)? Or do you want any of those built fully now?
-2. **Briefings are cloud-only** (require sign-in) — OK? Local-only users keep using the Agenda exactly as today.
-3. **Drag-and-drop on Agenda** — adding `@dnd-kit` (~15kb). OK to add?
-
-If yes to all three, I'll proceed straight through Phases 1 → 5.
+- "Local-only" means everything lives in your browser. Clearing site data wipes it — use Export from Settings to back up.
+- The ChatGPT bridge is purely copy/paste. No keys, no fees, no data leaving your machine except what you paste into ChatGPT yourself.
+- Themes are remembered per browser. "System" follows your OS setting.
