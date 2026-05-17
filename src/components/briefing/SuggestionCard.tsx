@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { dataService } from "@/lib/dataService";
-import { IdeasStore } from "@/lib/localStore";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Check, Archive, Lightbulb, Pencil, Plus, Save } from "lucide-react";
 
@@ -43,8 +43,15 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
 
   const saveAsIdea = async () => {
     try {
-      IdeasStore.add(title, description || "");
-      onChange(suggestion.id, { status: "accepted" });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await (supabase as any).from("ideas").insert([{
+          user_id: user.id,
+          title,
+          details: description || "",
+        }]);
+      }
+      onChange(suggestion.id, { status: "saved" });
       toast({ title: "Saved to Ideas" });
     } catch (e: any) {
       toast({ title: "Could not save", description: e?.message || "" });
@@ -56,7 +63,8 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
 
   if (suggestion.status !== "pending") {
     const label =
-      suggestion.status === "accepted" ? "Committed" : "Archived";
+      suggestion.status === "accepted" ? "Added to Agenda" :
+      suggestion.status === "saved" ? "Saved" : "Archived";
     return (
       <div className="glow-card p-4 opacity-60">
         <div className="flex items-center justify-between gap-3">
@@ -81,8 +89,8 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
               {suggestion.project}
             </span>
           )}
-          {suggestion.target_section && (
-            <span className="text-[10px] text-muted-foreground/70">from {suggestion.target_section}</span>
+          {suggestion.source_section && (
+            <span className="text-[10px] text-muted-foreground/70">from {suggestion.source_section}</span>
           )}
         </div>
         <button

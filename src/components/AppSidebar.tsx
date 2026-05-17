@@ -6,12 +6,11 @@ import {
   FolderKanban,
   Lightbulb,
   Sparkles,
+  Calendar,
   Users,
   Archive as ArchiveIcon,
   Search,
   Flower2,
-  ClipboardCheck,
-  Settings as SettingsIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,17 +30,13 @@ const items = [
   { title: "Command Centre", url: "/", icon: LayoutDashboard },
   { title: "Agenda", url: "/agenda", icon: CheckSquare },
   { title: "Processing Inbox", url: "/inbox", icon: Inbox },
-  { title: "Review", url: "/review", icon: ClipboardCheck },
   { title: "Projects", url: "/projects", icon: FolderKanban },
   { title: "Ideas", url: "/ideas", icon: Lightbulb },
   { title: "Opportunities", url: "/opportunities", icon: Sparkles },
+  { title: "Calendar", url: "/calendar", icon: Calendar },
   { title: "People", url: "/people-to-contact", icon: Users },
-];
-
-const utility = [
-  { title: "Search", url: "/search", icon: Search },
   { title: "Archive", url: "/archive", icon: ArchiveIcon },
-  { title: "Settings", url: "/settings", icon: SettingsIcon },
+  { title: "Search", url: "/search", icon: Search },
 ];
 
 export function AppSidebar() {
@@ -75,28 +70,15 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
-                      <NavLink to={item.url} className="group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm">
-                        <item.icon className="h-4 w-4" />
-                        {!collapsed && <span className="truncate">{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.18em]">Utilities</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {utility.map((item) => {
-                const active = pathname === item.url;
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
-                      <NavLink to={item.url} className="group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm">
-                        <item.icon className="h-4 w-4" />
+                      <NavLink
+                        to={item.url}
+                        className={`group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors ${
+                          active
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/60"
+                        }`}
+                      >
+                        <item.icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
                         {!collapsed && <span className="truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>

@@ -18,11 +18,6 @@ import PeopleToContact from "./pages/PeopleToContact";
 import ContactHistory from "./pages/ContactHistory";
 import Opportunities from "./pages/Opportunities";
 import ComingSoon from "./pages/ComingSoon";
-import Settings from "./pages/Settings";
-import SearchPage from "./pages/Search";
-import ArchivePage from "./pages/Archive";
-import ReviewPage from "./pages/Review";
-import ProjectsPage from "./pages/Projects";
 
 const queryClient = new QueryClient();
 
@@ -45,12 +40,10 @@ const App = () => (
             <Route path="/people-to-contact" element={<PeopleToContact />} />
             <Route path="/contact-history" element={<ContactHistory />} />
             <Route path="/opportunities" element={<Opportunities />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/review" element={<ReviewPage />} />
-            <Route path="/archive" element={<ArchivePage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/projects" element={<ComingSoon title="Projects" subtitle="Project workspaces with linked tasks, ideas and updates. Coming soon." />} />
             <Route path="/calendar" element={<ComingSoon title="Calendar" subtitle="A calm view of due dates and meetings. Coming soon." />} />
+            <Route path="/archive" element={<ComingSoon title="Archive" subtitle="Everything you've parked or set aside. Coming soon." />} />
+            <Route path="/search" element={<ComingSoon title="Search" subtitle="Find anything across your system. Coming soon." />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
