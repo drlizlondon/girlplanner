@@ -38,6 +38,7 @@ export class DataService {
         .from('tasks')
         .select('*')
         .eq('completed', false)
+        .not('status', 'in', '(archived,completed)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -61,6 +62,7 @@ export class DataService {
           additional_info: '',
           thoughts: '',
           completed: false,
+          status: 'active',
           user_id: user.id
         }])
         .select()
