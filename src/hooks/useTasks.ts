@@ -45,10 +45,7 @@ export const useTasks = () => {
       };
 
       setTasks([formattedTask, ...tasks]);
-      toast({
-        title: "Task added",
-        description: "Your new task has been added to the agenda.",
-      });
+      toast({ title: "Added to Current Agenda", description: title });
     } catch (error) {
       console.error('Error adding task:', error);
       toast({
@@ -155,5 +152,6 @@ export const useTasks = () => {
     completeTask,
     deleteTask,
     updateTask,
+    refetch: fetchTasks,
   };
 };
