@@ -23,7 +23,7 @@ export function SimpleListModule({
 
   return (
     <ModuleCard title={title} kicker={kicker} icon={icon} accent={accent} span={span} href={href}>
-      <QuickAdd placeholder={placeholder} onAdd={(v) => add(v)} />
+      <QuickAdd placeholder={placeholder} onAdd={async (v) => { await add(v); }} />
       {rows.length === 0 ? (
         <EmptyHint>{emptyHint}</EmptyHint>
       ) : (
