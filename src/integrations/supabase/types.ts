@@ -19,10 +19,14 @@ export type Database = {
           briefing_id: string
           created_at: string
           description: string | null
+          draft: string | null
           id: string
+          linked_task_id: string | null
+          next_steps: Json | null
           position: number | null
           priority: string | null
           project: string | null
+          source: string
           source_section: string | null
           status: string
           title: string
@@ -34,10 +38,14 @@ export type Database = {
           briefing_id: string
           created_at?: string
           description?: string | null
+          draft?: string | null
           id?: string
+          linked_task_id?: string | null
+          next_steps?: Json | null
           position?: number | null
           priority?: string | null
           project?: string | null
+          source?: string
           source_section?: string | null
           status?: string
           title: string
@@ -49,10 +57,14 @@ export type Database = {
           briefing_id?: string
           created_at?: string
           description?: string | null
+          draft?: string | null
           id?: string
+          linked_task_id?: string | null
+          next_steps?: Json | null
           position?: number | null
           priority?: string | null
           project?: string | null
+          source?: string
           source_section?: string | null
           status?: string
           title?: string
@@ -199,6 +211,72 @@ export type Database = {
         }
         Relationships: []
       }
+      notes: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          project_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      open_questions: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          project_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       opportunities: {
         Row: {
           created_at: string
@@ -256,6 +334,69 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      strategic_signals: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          project_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_types: {
         Row: {
           created_at: string
@@ -289,6 +430,8 @@ export type Database = {
           due_date: string | null
           id: string
           priority: string
+          project_id: string | null
+          status: string
           thoughts: string | null
           title: string
           type: string
@@ -303,6 +446,8 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          project_id?: string | null
+          status?: string
           thoughts?: string | null
           title: string
           type?: string
@@ -317,11 +462,49 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          project_id?: string | null
+          status?: string
           thoughts?: string | null
           title?: string
           type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      waiting_on: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          project_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          who: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          who?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          who?: string | null
         }
         Relationships: []
       }
