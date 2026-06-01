@@ -7,6 +7,7 @@ import { dataService } from "@/lib/dataService";
 import { Link } from "react-router-dom";
 import { Archive, ArrowLeft, Sparkles } from "lucide-react";
 import { format } from "date-fns";
+import { ImportFromChatGPT } from "@/components/agenda/ImportFromChatGPT";
 
 const SAMPLE_PLACEHOLDER = `Paste Daily Executive Processing report…
 
@@ -112,6 +113,11 @@ export default function ProcessingInbox() {
             {submitting ? "Creating…" : "Create Briefing"}
           </Button>
         </div>
+      </div>
+
+      {/* Manual ChatGPT bridge */}
+      <div className="mt-8">
+        <ImportFromChatGPT onImported={refetch} />
       </div>
 
       {/* Recent briefings */}
