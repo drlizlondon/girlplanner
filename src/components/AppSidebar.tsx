@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  CheckSquare,
+  ListChecks,
   Inbox,
   FolderKanban,
   Lightbulb,
@@ -11,7 +11,12 @@ import {
   Archive as ArchiveIcon,
   Search,
   Flower2,
+  FileText,
+  Hourglass,
+  Star,
+  HelpCircle,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Sidebar,
   SidebarContent,
@@ -28,11 +33,15 @@ import {
 
 const items = [
   { title: "Command Centre", url: "/", icon: LayoutDashboard },
-  { title: "Agenda", url: "/agenda", icon: CheckSquare },
+  { title: "Current Agenda", url: "/agenda", icon: ListChecks },
+  { title: "Focus Now", url: "/focus", icon: Star },
   { title: "Processing Inbox", url: "/inbox", icon: Inbox },
   { title: "Projects", url: "/projects", icon: FolderKanban },
+  { title: "Notes", url: "/notes", icon: FileText },
+  { title: "Waiting On", url: "/waiting-on", icon: Hourglass },
   { title: "Ideas", url: "/ideas", icon: Lightbulb },
   { title: "Opportunities", url: "/opportunities", icon: Sparkles },
+  { title: "Open Questions", url: "/questions", icon: HelpCircle },
   { title: "Calendar", url: "/calendar", icon: Calendar },
   { title: "People", url: "/people-to-contact", icon: Users },
   { title: "Archive", url: "/archive", icon: ArchiveIcon },
@@ -91,10 +100,15 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-3">
-        {!collapsed && (
-          <p className="text-[10px] leading-relaxed text-muted-foreground/70">
-            The Agenda is the trusted system. Everything else supports it.
-          </p>
+        {!collapsed ? (
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[10px] leading-relaxed text-muted-foreground/70 flex-1">
+              The Agenda is the trusted system.
+            </p>
+            <ThemeToggle compact />
+          </div>
+        ) : (
+          <div className="flex justify-center"><ThemeToggle compact /></div>
         )}
       </SidebarFooter>
     </Sidebar>

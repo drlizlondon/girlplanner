@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { dataService } from "@/lib/dataService";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Archive, Lightbulb, Pencil, Plus, Save } from "lucide-react";
+import { Check, Archive, Lightbulb, Pencil, Plus, Save, Star, Briefcase, Trash2 } from "lucide-react";
 
 interface Props {
   suggestion: SuggestionRow;
@@ -60,6 +60,42 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
 
   const archive = () =>
     onChange(suggestion.id, { status: "archived" });
+
+  const remove = async () => {
+    await (supabase as any).from("briefing_suggestions").delete().eq("id", suggestion.id);
+    onChange(suggestion.id, { status: "archived" });
+    toast({ title: "Deleted" });
+  };
+
+  const addToFocus = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sign in required");
+      await (supabase as any).from("tasks").insert([{
+        user_id: user.id, title, type: "_none", priority: "low",
+        additional_info: description || "", thoughts: "",
+        completed: false, status: "focus",
+      }]);
+      onChange(suggestion.id, { status: "accepted" });
+      toast({ title: "Added to Focus Now" });
+    } catch (e: any) {
+      toast({ title: "Could not add to Focus", description: e?.message || "" });
+    }
+  };
+
+  const convertToProject = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sign in required");
+      await (supabase as any).from("projects").insert([{
+        user_id: user.id, title, body: description || "",
+      }]);
+      onChange(suggestion.id, { status: "accepted" });
+      toast({ title: "Project created" });
+    } catch (e: any) {
+      toast({ title: "Could not create project", description: e?.message || "" });
+    }
+  };
 
   if (suggestion.status !== "pending") {
     const label =
@@ -127,6 +163,16 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
             {suggestion.type === "follow_up" ? "Convert to Task" : "Add to Agenda"}
           </Button>
         )}
+        {(suggestion.type === "priority_action" || suggestion.type === "follow_up") && (
+          <Button size="sm" variant="outline" onClick={addToFocus}>
+            <Star className="h-3.5 w-3.5 mr-1" />
+            Add to Focus
+          </Button>
+        )}
+        <Button size="sm" variant="outline" onClick={convertToProject}>
+          <Briefcase className="h-3.5 w-3.5 mr-1" />
+          Convert to Project
+        </Button>
         {suggestion.type !== "idea" && (
           <Button size="sm" variant="outline" onClick={saveAsIdea}>
             <Lightbulb className="h-3.5 w-3.5 mr-1" />
@@ -144,6 +190,10 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
         <Button size="sm" variant="ghost" onClick={archive} className="text-muted-foreground hover:text-foreground">
           <Archive className="h-3.5 w-3.5 mr-1" />
           Archive
+        </Button>
+        <Button size="sm" variant="ghost" onClick={remove} className="text-muted-foreground hover:text-destructive">
+          <Trash2 className="h-3.5 w-3.5 mr-1" />
+          Delete
         </Button>
       </div>
     </div>

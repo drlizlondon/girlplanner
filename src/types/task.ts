@@ -1,6 +1,8 @@
 
 export type Priority = "high" | "medium" | "low";
 
+export type TaskStatus = "active" | "focus" | "paused" | "archived" | "completed";
+
 export interface Task {
   id: string;
   title: string;
@@ -13,4 +15,6 @@ export interface Task {
   files: File[];
   created_at?: string;
   completed_at?: string;
+  status?: TaskStatus;
+  project_id?: string | null;
 }
