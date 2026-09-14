@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { dataService } from "@/lib/dataService";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,7 +18,37 @@ export const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<"auth" | "forgot">("auth");
+  const [resetSent, setResetSent] = useState(false);
   const { toast } = useToast();
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({
+        title: "Email needed",
+        description: "Enter your email address so we can send you a reset link.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setIsLoading(false);
+
+    if (error) {
+      toast({ title: "Couldn't send reset email", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    setResetSent(true);
+    toast({
+      title: "Reset link sent",
+      description: "Check your inbox (and spam folder) for the link to set a new password.",
+    });
+  };
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -34,11 +65,17 @@ export const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
       const { error } = await dataService.signIn(email, password);
       
       if (error) {
+        const wrongCredentials =
+          error.message.toLowerCase().includes("invalid login credentials") ||
+          (error as any).code === "invalid_credentials";
         toast({
           title: "Sign in failed",
-          description: error.message,
+          description: wrongCredentials
+            ? "Email or password is incorrect — try resetting your password."
+            : error.message,
           variant: "destructive",
         });
+        if (wrongCredentials) setMode("forgot");
       } else {
         toast({
           title: "Welcome back!",
