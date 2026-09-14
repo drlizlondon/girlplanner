@@ -10,6 +10,7 @@ import ProcessingInbox from "./pages/ProcessingInbox";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import Agenda from "./pages/Agenda";
 import Summary from "./pages/Summary";
 import Customise from "./pages/Customise";
@@ -33,6 +34,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/register" element={<Register />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<CommandCentrePage />} />
             <Route path="/agenda" element={<Agenda />} />

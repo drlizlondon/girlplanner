@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { dataService } from "@/lib/dataService";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,7 +18,37 @@ export const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<"auth" | "forgot">("auth");
+  const [resetSent, setResetSent] = useState(false);
   const { toast } = useToast();
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({
+        title: "Email needed",
+        description: "Enter your email address so we can send you a reset link.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setIsLoading(false);
+
+    if (error) {
+      toast({ title: "Couldn't send reset email", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    setResetSent(true);
+    toast({
+      title: "Reset link sent",
+      description: "Check your inbox (and spam folder) for the link to set a new password.",
+    });
+  };
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -34,11 +65,17 @@ export const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
       const { error } = await dataService.signIn(email, password);
       
       if (error) {
+        const wrongCredentials =
+          error.message.toLowerCase().includes("invalid login credentials") ||
+          (error as any).code === "invalid_credentials";
         toast({
           title: "Sign in failed",
-          description: error.message,
+          description: wrongCredentials
+            ? "Email or password is incorrect — try resetting your password."
+            : error.message,
           variant: "destructive",
         });
+        if (wrongCredentials) setMode("forgot");
       } else {
         toast({
           title: "Welcome back!",
@@ -104,6 +141,52 @@ export const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
     }
   };
 
+  if (mode === "forgot") {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset your password</DialogTitle>
+          </DialogHeader>
+
+          {resetSent ? (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                We've emailed a link to <span className="text-foreground">{email}</span>. Open it to choose a new
+                password, then you'll be signed straight in.
+              </p>
+              <Button variant="outline" className="w-full" onClick={() => { setResetSent(false); setMode("auth"); }}>
+                Back to sign in
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Enter your email and we'll send you a link to set a new password.
+              </p>
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                />
+              </div>
+              <Button className="w-full" onClick={handleForgotPassword} disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send reset link"}
+              </Button>
+              <Button variant="ghost" className="w-full" onClick={() => setMode("auth")}>
+                Back to sign in
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -145,6 +228,13 @@ export const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
+            <button
+              type="button"
+              onClick={() => setMode("forgot")}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
+            >
+              Forgot your password?
+            </button>
           </TabsContent>
           
           <TabsContent value="signup" className="space-y-4">
