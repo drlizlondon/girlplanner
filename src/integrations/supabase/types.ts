@@ -334,11 +334,91 @@ export type Database = {
         }
         Relationships: []
       }
+      project_roadmap_items: {
+        Row: {
+          body: string | null
+          created_at: string
+          done: boolean
+          id: string
+          position: number
+          project_id: string
+          stage: string
+          target_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          done?: boolean
+          id?: string
+          position?: number
+          project_id: string
+          stage?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          done?: boolean
+          id?: string
+          position?: number
+          project_id?: string
+          stage?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      project_screenshots: {
+        Row: {
+          caption: string | null
+          created_at: string
+          height: number | null
+          id: string
+          project_id: string
+          storage_path: string
+          updated_at: string
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          project_id: string
+          storage_path: string
+          updated_at?: string
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          project_id?: string
+          storage_path?: string
+          updated_at?: string
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           body: string | null
           created_at: string
+          description: string | null
           id: string
+          position: number | null
           status: string
           title: string
           updated_at: string
@@ -347,7 +427,9 @@ export type Database = {
         Insert: {
           body?: string | null
           created_at?: string
+          description?: string | null
           id?: string
+          position?: number | null
           status?: string
           title: string
           updated_at?: string
@@ -356,7 +438,9 @@ export type Database = {
         Update: {
           body?: string | null
           created_at?: string
+          description?: string | null
           id?: string
+          position?: number | null
           status?: string
           title?: string
           updated_at?: string
