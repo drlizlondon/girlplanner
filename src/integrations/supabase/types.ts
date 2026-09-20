@@ -82,63 +82,6 @@ export type Database = {
           },
         ]
       }
-      contact_history: {
-        Row: {
-          comments: string | null
-          contacted_at: string
-          created_at: string
-          id: string
-          name: string
-          user_id: string
-        }
-        Insert: {
-          comments?: string | null
-          contacted_at?: string
-          created_at?: string
-          id?: string
-          name: string
-          user_id: string
-        }
-        Update: {
-          comments?: string | null
-          contacted_at?: string
-          created_at?: string
-          id?: string
-          name?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      contacts: {
-        Row: {
-          comments: string | null
-          contacted: boolean
-          created_at: string
-          id: string
-          name: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          comments?: string | null
-          contacted?: boolean
-          created_at?: string
-          id?: string
-          name: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          comments?: string | null
-          contacted?: boolean
-          created_at?: string
-          id?: string
-          name?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       daily_briefings: {
         Row: {
           briefing_date: string
@@ -271,36 +214,6 @@ export type Database = {
           id?: string
           project_id?: string | null
           status?: string
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      opportunities: {
-        Row: {
-          created_at: string
-          deadline_date: string | null
-          details: string | null
-          id: string
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          deadline_date?: string | null
-          details?: string | null
-          id?: string
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          deadline_date?: string | null
-          details?: string | null
-          id?: string
           title?: string
           updated_at?: string
           user_id?: string
@@ -441,39 +354,6 @@ export type Database = {
           description?: string | null
           id?: string
           position?: number | null
-          status?: string
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      strategic_signals: {
-        Row: {
-          body: string | null
-          created_at: string
-          id: string
-          project_id: string | null
-          status: string
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          project_id?: string | null
-          status?: string
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          project_id?: string | null
           status?: string
           title?: string
           updated_at?: string

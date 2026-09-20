@@ -1,12 +1,11 @@
 import { format } from "date-fns";
 import {
-  FileText, HelpCircle, Sparkles, Briefcase, Hourglass,
+  FileText, HelpCircle, Briefcase, Hourglass,
 } from "lucide-react";
 import { CurrentAgendaModule } from "./modules/CurrentAgendaModule";
 import { ProcessingInboxModule } from "./modules/ProcessingInboxModule";
 import { QuickCaptureModule } from "./modules/QuickCaptureModule";
-import { PeopleModule } from "./modules/PeopleModule";
-import { OpportunitiesModule, IdeasModule } from "./modules/OpportunitiesModule";
+import { IdeasModule } from "./modules/IdeasModule";
 import { RecentActivityModule } from "./modules/RecentActivityModule";
 import { BriefingsArchiveModule } from "./modules/BriefingsArchiveModule";
 import { SimpleListModule } from "./modules/SimpleListModule";
@@ -56,21 +55,8 @@ export default function CommandCentre() {
           span={6}
           href="/projects"
         />
-        <PeopleModule span={6} />
-
-        <OpportunitiesModule span={6} />
         <IdeasModule span={6} />
 
-        <SimpleListModule
-          table="strategic_signals"
-          title="Strategic Signals"
-          kicker="Patterns worth noticing"
-          icon={Sparkles}
-          accent="green"
-          placeholder="Observation, signal, or pattern…"
-          emptyHint="Notice what's shifting. Decisions later."
-          span={4}
-        />
         <SimpleListModule
           table="open_questions"
           title="Open Questions"
@@ -79,7 +65,7 @@ export default function CommandCentre() {
           accent="purple"
           placeholder="What are you still figuring out?"
           emptyHint="Sit with the unresolved. Not everything needs an answer today."
-          span={4}
+          span={6}
         />
         <SimpleListModule
           table="notes"
@@ -89,7 +75,7 @@ export default function CommandCentre() {
           accent="blue"
           placeholder="A note for later…"
           emptyHint="Loose thoughts. No structure required."
-          span={4}
+          span={6}
         />
 
         <RecentActivityModule span={6} />

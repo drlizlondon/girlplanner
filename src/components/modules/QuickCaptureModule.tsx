@@ -1,22 +1,19 @@
 import { useState } from "react";
-import { Zap, ListChecks, Lightbulb, Users, HelpCircle, FileText, Sparkles, Briefcase } from "lucide-react";
+import { Zap, ListChecks, Lightbulb, HelpCircle, FileText, Briefcase } from "lucide-react";
 import { ModuleCard } from "./ModuleCard";
 import { useTasks } from "@/hooks/useTasks";
 import { useSimpleTable } from "@/hooks/useSimpleTable";
 import { dataService } from "@/lib/dataService";
 import { useToast } from "@/hooks/use-toast";
 
-type Target = "agenda" | "idea" | "note" | "person" | "question" | "signal" | "project" | "opportunity";
+type Target = "agenda" | "idea" | "note" | "question" | "project";
 
 const TARGETS: { id: Target; label: string; icon: any }[] = [
   { id: "agenda", label: "Agenda", icon: ListChecks },
   { id: "idea", label: "Idea", icon: Lightbulb },
   { id: "note", label: "Note", icon: FileText },
-  { id: "person", label: "Person", icon: Users },
   { id: "question", label: "Question", icon: HelpCircle },
-  { id: "signal", label: "Signal", icon: Sparkles },
   { id: "project", label: "Project", icon: Briefcase },
-  { id: "opportunity", label: "Opportunity", icon: Sparkles },
 ];
 
 export function QuickCaptureModule({ span = 12 }: { span?: 4 | 6 | 8 | 12 }) {
@@ -25,7 +22,6 @@ export function QuickCaptureModule({ span = 12 }: { span?: 4 | 6 | 8 | 12 }) {
   const { addTask } = useTasks();
   const notes = useSimpleTable("notes");
   const questions = useSimpleTable("open_questions");
-  const signals = useSimpleTable("strategic_signals");
   const projects = useSimpleTable("projects");
   const { toast } = useToast();
 
@@ -38,11 +34,8 @@ export function QuickCaptureModule({ span = 12 }: { span?: 4 | 6 | 8 | 12 }) {
         case "agenda":      await addTask(value); break;
         case "idea":        await dataService.addIdea(value); toast({ title: "Captured to Ideas" }); break;
         case "note":        await notes.add(value); toast({ title: "Note captured" }); break;
-        case "person":      await dataService.addContact(value); toast({ title: "Person captured" }); break;
         case "question":    await questions.add(value); toast({ title: "Question captured" }); break;
-        case "signal":      await signals.add(value); toast({ title: "Signal captured" }); break;
         case "project":     await projects.add(value); toast({ title: "Project created" }); break;
-        case "opportunity": await dataService.addOpportunity(value); toast({ title: "Opportunity captured" }); break;
       }
       setV("");
     } catch (e: any) {
@@ -56,7 +49,7 @@ export function QuickCaptureModule({ span = 12 }: { span?: 4 | 6 | 8 | 12 }) {
         <input
           value={v}
           onChange={(e) => setV(e.target.value)}
-          placeholder='e.g. "Sarah Chen, product designer from conference"'
+          placeholder='e.g. "Draft the investor update"'
           className="flex-1 h-12 px-4 rounded-xl bg-surface border border-border-subtle focus:border-primary/50 focus:outline-none text-[15px] placeholder:text-muted-foreground/70 transition-colors"
         />
         <button

@@ -33,7 +33,7 @@ export function ProcessingInboxModule({ span = 6 }: { span?: 4 | 6 | 8 | 12 }) {
     >
       {items.length === 0 ? (
         <EmptyHint>
-          Paste a daily briefing or a ChatGPT return block on the Processing Inbox.
+          Capture your notes, then Summarise with AI on the Processing Inbox.
           Nothing here auto-enters the Agenda.
         </EmptyHint>
       ) : (

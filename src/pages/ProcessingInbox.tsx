@@ -1,15 +1,27 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useBriefings, BriefingRow } from "@/hooks/useBriefings";
 import { BriefingView } from "@/components/briefing/BriefingView";
 import { dataService } from "@/lib/dataService";
+import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { Archive, ArrowLeft, Sparkles } from "lucide-react";
+import { Archive, ArrowLeft, Sparkles, WifiOff } from "lucide-react";
 import { format } from "date-fns";
-import { ImportFromChatGPT } from "@/components/agenda/ImportFromChatGPT";
+import {
+  summariseNotes,
+  queueSummary,
+  isOnline,
+  flushSummaryQueue,
+} from "@/lib/summariseNotes";
 
-const SAMPLE_PLACEHOLDER = `Paste Daily Executive Processing report…
+const SAMPLE_PLACEHOLDER = `Dump your raw notes or a voice transcript here, then Summarise with AI…
+
+e.g. "Spoke to Sarah about the contract, need to reply by Friday. Investor
+update is overdue. Idea: public roadmap as a marketing surface. Still unsure
+whether we build for power users or first-timers first."
+
+— or paste a ready-made Daily Executive Processing report and Create Briefing:
 
 ## Overview
 Short paragraph framing the day.
@@ -43,13 +55,46 @@ export default function ProcessingInbox() {
   const { briefings, loading, createBriefing, refetch } = useBriefings();
   const [raw, setRaw] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [summarising, setSummarising] = useState(false);
+  const [online, setOnline] = useState(isOnline());
   const [activeBriefing, setActiveBriefing] = useState<BriefingRow | null>(null);
   const [authed, setAuthed] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     (async () => setAuthed(await dataService.isUserAuthenticated()))();
   }, []);
 
+  // Flush any summaries that were queued while offline — on mount and whenever
+  // the connection returns. The summary is enrichment; it never blocks capture.
+  const flush = useCallback(async () => {
+    setOnline(isOnline());
+    if (!isOnline()) return;
+    const done = await flushSummaryQueue(async (markdown) => {
+      await createBriefing(markdown);
+    });
+    if (done > 0) {
+      await refetch();
+      toast({
+        title: "Caught up",
+        description: `Summarised ${done} note${done === 1 ? "" : "s"} queued while you were offline.`,
+      });
+    }
+  }, [createBriefing, refetch, toast]);
+
+  useEffect(() => {
+    flush();
+    const onOnline = () => flush();
+    const onOffline = () => setOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, [flush]);
+
+  // Deterministic path — parse the pasted markdown locally, no AI. Works offline.
   const submit = async () => {
     if (!raw.trim()) return;
     setSubmitting(true);
@@ -59,6 +104,44 @@ export default function ProcessingInbox() {
       setActiveBriefing(b);
       setRaw("");
       await refetch();
+    }
+  };
+
+  // AI path — send raw notes to the Edge Function, then run the returned
+  // markdown through the same createBriefing() path. Online-only: when offline
+  // we queue and tell the user, never blocking or erroring the capture.
+  const summarise = async () => {
+    const notes = raw.trim();
+    if (!notes) return;
+    if (!isOnline()) {
+      queueSummary(notes);
+      setRaw("");
+      toast({
+        title: "Offline — saved for later",
+        description: "We'll summarise these notes automatically when you're back online.",
+      });
+      return;
+    }
+    setSummarising(true);
+    try {
+      const markdown = await summariseNotes(notes);
+      const b = await createBriefing(markdown);
+      if (b) {
+        setActiveBriefing(b);
+        setRaw("");
+        await refetch();
+      }
+    } catch (e) {
+      // Never lose the capture — keep the raw text and offer the manual path.
+      const msg = (e as Error)?.message;
+      toast({
+        title: "Couldn't summarise just now",
+        description: msg
+          ? `${msg}. Your notes are safe — try again or use Create Briefing.`
+          : "Your notes are safe — try again or use Create Briefing.",
+      });
+    } finally {
+      setSummarising(false);
     }
   };
 
@@ -82,8 +165,8 @@ export default function ProcessingInbox() {
         <div className="text-[10px] uppercase tracking-[0.22em] text-primary/80">Processing</div>
         <h1 className="mt-1 text-3xl sm:text-4xl font-serif-display text-foreground">Processing Inbox</h1>
         <p className="mt-2 text-muted-foreground max-w-2xl">
-          Paste a daily report and decide what deserves to become part of your system.
-          Nothing is added automatically.
+          Capture your notes, summarise them into a briefing, and decide what deserves
+          to become part of your system. Nothing is added automatically.
         </p>
       </div>
 
@@ -105,19 +188,33 @@ export default function ProcessingInbox() {
           placeholder={SAMPLE_PLACEHOLDER}
           className="min-h-[320px] bg-surface/60 border-border-subtle focus-visible:ring-primary/40 text-sm leading-relaxed font-mono"
         />
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="text-xs text-muted-foreground">
-            Parsed deterministically from markdown headings. No AI.
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            {online ? (
+              "Summarise with AI, or Create Briefing to parse pasted markdown yourself. Nothing auto-commits."
+            ) : (
+              <>
+                <WifiOff className="h-3 w-3" /> Offline — capture still works. Summaries queue until you reconnect.
+              </>
+            )}
           </span>
-          <Button onClick={submit} disabled={!raw.trim() || submitting || !authed}>
-            {submitting ? "Creating…" : "Create Briefing"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={submit}
+              disabled={!raw.trim() || submitting || summarising || !authed}
+            >
+              {submitting ? "Creating…" : "Create Briefing"}
+            </Button>
+            <Button
+              onClick={summarise}
+              disabled={!raw.trim() || summarising || submitting || !authed}
+            >
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+              {summarising ? "Summarising…" : online ? "Summarise with AI" : "Queue for AI"}
+            </Button>
+          </div>
         </div>
-      </div>
-
-      {/* Manual ChatGPT bridge */}
-      <div className="mt-8">
-        <ImportFromChatGPT onImported={refetch} />
       </div>
 
       {/* Recent briefings */}

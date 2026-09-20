@@ -15,9 +15,6 @@ import Agenda from "./pages/Agenda";
 import Summary from "./pages/Summary";
 import Customise from "./pages/Customise";
 import GoodIdeas from "./pages/GoodIdeas";
-import PeopleToContact from "./pages/PeopleToContact";
-import ContactHistory from "./pages/ContactHistory";
-import Opportunities from "./pages/Opportunities";
 import ComingSoon from "./pages/ComingSoon";
 import SimpleModulePage from "./pages/SimpleModulePage";
 import { CurrentAgendaModule } from "./components/modules/CurrentAgendaModule";
@@ -43,9 +40,6 @@ const App = () => (
             <Route path="/summary" element={<Summary />} />
             <Route path="/customise" element={<Customise />} />
             <Route path="/ideas" element={<GoodIdeas />} />
-            <Route path="/people-to-contact" element={<PeopleToContact />} />
-            <Route path="/contact-history" element={<ContactHistory />} />
-            <Route path="/opportunities" element={<Opportunities />} />
             <Route path="/focus" element={
               <SimpleModulePage title="Focus Now" subtitle="Items you've personally promoted. The system never auto-fills this lane.">
                 <CurrentAgendaModule focusOnly span={12} />

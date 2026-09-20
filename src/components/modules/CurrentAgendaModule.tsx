@@ -1,19 +1,35 @@
 import { useMemo, useState } from "react";
-import { CheckSquare, ListChecks, Send, Star, Trash2, X, Check } from "lucide-react";
+import { CheckSquare, ListChecks, Sparkles, Star, Trash2, X, Check } from "lucide-react";
 import { ModuleCard, QuickAdd, EmptyHint } from "./ModuleCard";
 import { useTasks } from "@/hooks/useTasks";
+import { useBriefings } from "@/hooks/useBriefings";
 import { Task } from "@/types/task";
-import { ExportToChatGPTModal } from "@/components/agenda/ExportToChatGPTModal";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { summariseNotes, queueSummary, isOnline } from "@/lib/summariseNotes";
 import { format } from "date-fns";
+
+function tasksToNotes(tasks: Task[]): string {
+  const lines = tasks.map((t) => {
+    const bits = [`- ${t.title}`];
+    if (t.priority) bits.push(`(priority: ${t.priority})`);
+    if (t.dueDate) bits.push(`(due: ${format(t.dueDate, "yyyy-MM-dd")})`);
+    const notes = (t.additional_info || t.thoughts || "").trim();
+    if (notes) bits.push(`— ${notes.replace(/\n+/g, " ")}`);
+    return bits.join(" ");
+  });
+  return `Current agenda items I want help processing:\n${lines.join("\n")}`;
+}
 
 export function CurrentAgendaModule({
   focusOnly = false,
   span = 8,
 }: { focusOnly?: boolean; span?: 4 | 6 | 8 | 12 }) {
   const { tasks, addTask, completeTask, deleteTask, refetch } = useTasks();
+  const { createBriefing } = useBriefings();
+  const { toast } = useToast();
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [exportOpen, setExportOpen] = useState(false);
+  const [summarising, setSummarising] = useState(false);
 
   const visible = useMemo(
     () => (focusOnly ? tasks.filter((t) => (t as any).status === "focus") : tasks),
@@ -34,6 +50,39 @@ export function CurrentAgendaModule({
     refetch();
   };
 
+  const summariseSelected = async () => {
+    if (selectedTasks.length === 0) return;
+    const notes = tasksToNotes(selectedTasks);
+    if (!isOnline()) {
+      queueSummary(notes);
+      toast({
+        title: "Offline — saved for later",
+        description: "We'll summarise these on the Processing Inbox when you're back online.",
+      });
+      return;
+    }
+    setSummarising(true);
+    try {
+      const markdown = await summariseNotes(notes);
+      const b = await createBriefing(markdown);
+      if (b) {
+        setSelected(new Set());
+        toast({
+          title: "Briefing ready",
+          description: "Review the suggestions in the Processing Inbox.",
+        });
+      }
+    } catch (e) {
+      const msg = (e as Error)?.message;
+      toast({
+        title: "Couldn't summarise just now",
+        description: msg ? `${msg}. Try again shortly.` : "Try again shortly.",
+      });
+    } finally {
+      setSummarising(false);
+    }
+  };
+
   return (
     <>
       <ModuleCard
@@ -47,11 +96,12 @@ export function CurrentAgendaModule({
         action={
           !focusOnly && selected.size > 0 ? (
             <button
-              onClick={() => setExportOpen(true)}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90"
+              onClick={summariseSelected}
+              disabled={summarising}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 disabled:opacity-50"
             >
-              <Send className="h-3 w-3" />
-              Export to ChatGPT ({selected.size})
+              <Sparkles className="h-3 w-3" />
+              {summarising ? "Summarising…" : `Summarise with AI (${selected.size})`}
             </button>
           ) : null
         }
@@ -102,8 +152,6 @@ export function CurrentAgendaModule({
           </ul>
         )}
       </ModuleCard>
-
-      <ExportToChatGPTModal open={exportOpen} onOpenChange={setExportOpen} tasks={selectedTasks} />
     </>
   );
 }

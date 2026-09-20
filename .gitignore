@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Environment files. The existing .env holds only the public Supabase URL +
+# anon (publishable) key and stays committed for the Vite build. This rule
+# stops any NEW env file (e.g. .env.local) or a future real secret from being
+# committed by accident. Real secrets (e.g. GEMINI_API_KEY) live only in the
+# Supabase Edge Function secrets, never in the client bundle.
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
