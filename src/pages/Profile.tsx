@@ -7,48 +7,22 @@ import { Camera } from "lucide-react";
 import { Header } from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { dataService } from "@/lib/dataService";
+import { useProfile } from "@/hooks/useProfile";
 
 const Profile = () => {
+  const { isAuthenticated, name: loadedName, photoUrl: loadedPhotoUrl, email, loading, refresh } = useProfile();
   const [name, setName] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sendingReset, setSendingReset] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadProfile = async () => {
-      const authenticated = await dataService.isUserAuthenticated();
-      setIsAuthenticated(authenticated);
-
-      if (authenticated) {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          if (profile) {
-            setName(profile.user_name || "");
-            setPhotoUrl(profile.photo_url || "");
-          }
-        }
-      } else {
-        // Load from localStorage for local users
-        const localProfile = localStorage.getItem("localProfile");
-        if (localProfile) {
-          const profile = JSON.parse(localProfile);
-          setName(profile.name || "");
-          setPhotoUrl(profile.photoUrl || "");
-        }
-      }
-    };
-
-    loadProfile();
-  }, []);
+    if (!loading) {
+      setName(loadedName);
+      setPhotoUrl(loadedPhotoUrl);
+    }
+  }, [loading, loadedName, loadedPhotoUrl]);
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -136,6 +110,7 @@ const Profile = () => {
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
       });
+      refresh();
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
@@ -144,6 +119,29 @@ const Profile = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) return;
+    setSendingReset(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setSendingReset(false);
+
+    if (error) {
+      toast({
+        title: "Couldn't send reset email",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Reset link sent",
+      description: "Check your inbox for a link to set a new password.",
+    });
   };
 
   const handleSignOut = async () => {
@@ -226,6 +224,24 @@ const Profile = () => {
                   className="w-full text-sm sm:text-base"
                 />
               </div>
+
+              {isAuthenticated && (
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2"
+                  >
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    value={email}
+                    readOnly
+                    disabled
+                    className="w-full text-sm sm:text-base bg-gray-100"
+                  />
+                </div>
+              )}
             </div>
 
             <Button
@@ -234,6 +250,17 @@ const Profile = () => {
             >
               Save Changes
             </Button>
+
+            {isAuthenticated && (
+              <Button
+                onClick={handlePasswordReset}
+                disabled={sendingReset}
+                variant="outline"
+                className="w-full text-sm sm:text-base"
+              >
+                {sendingReset ? "Sending..." : "Change password"}
+              </Button>
+            )}
           </div>
         </div>
       </div>
