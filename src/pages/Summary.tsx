@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { CompletedTasksTable } from "@/components/completed-tasks/CompletedTasksTable";
 import { useCompletedTasks } from "@/hooks/useCompletedTasks";
