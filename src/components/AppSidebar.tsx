@@ -3,18 +3,9 @@ import {
   LayoutDashboard,
   ListChecks,
   Inbox,
-  FolderKanban,
-  Lightbulb,
-  Sparkles,
-  Calendar,
-  Users,
-  Archive as ArchiveIcon,
-  Search,
+  Mic,
+  User,
   Flower2,
-  FileText,
-  Hourglass,
-  Star,
-  HelpCircle,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -34,18 +25,9 @@ import {
 const items = [
   { title: "Command Centre", url: "/", icon: LayoutDashboard },
   { title: "Current Agenda", url: "/agenda", icon: ListChecks },
-  { title: "Focus Now", url: "/focus", icon: Star },
   { title: "Processing Inbox", url: "/inbox", icon: Inbox },
-  { title: "Projects", url: "/projects", icon: FolderKanban },
-  { title: "Notes", url: "/notes", icon: FileText },
-  { title: "Waiting On", url: "/waiting-on", icon: Hourglass },
-  { title: "Ideas", url: "/ideas", icon: Lightbulb },
-  { title: "Opportunities", url: "/opportunities", icon: Sparkles },
-  { title: "Open Questions", url: "/questions", icon: HelpCircle },
-  { title: "Calendar", url: "/calendar", icon: Calendar },
-  { title: "People", url: "/people-to-contact", icon: Users },
-  { title: "Archive", url: "/archive", icon: ArchiveIcon },
-  { title: "Search", url: "/search", icon: Search },
+  { title: "Voice Setup Guide", url: "/guide", icon: Mic },
+  { title: "Account & Sync", url: "/profile", icon: User },
 ];
 
 export function AppSidebar() {
@@ -62,8 +44,8 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight text-foreground">Founder OS</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Command Centre</span>
+              <span className="text-sm font-semibold tracking-tight text-foreground">Girl Planner</span>
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Founder OS</span>
             </div>
           )}
         </NavLink>

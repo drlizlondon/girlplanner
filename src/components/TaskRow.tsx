@@ -20,11 +20,11 @@ interface TaskRowProps {
 const getPriorityColor = (priority: Task["priority"]) => {
   switch (priority) {
     case "high":
-      return "text-red-500";
+      return "text-red-600 dark:text-red-400 font-medium";
     case "medium":
-      return "text-orange-400";
+      return "text-amber-600 dark:text-amber-400 font-medium";
     case "low":
-      return "text-blue-500";
+      return "text-blue-600 dark:text-blue-400 font-medium";
   }
 };
 
@@ -35,7 +35,7 @@ export const TaskRow = ({
   onDeleteTask,
 }: TaskRowProps) => {
   return (
-    <TableRow className={`transition-all duration-300 ${task.completed ? 'opacity-50' : ''}`}>
+    <TableRow className={`transition-all duration-300 ${task.completed ? 'opacity-70 line-through' : ''}`}>
       <TableCell>
         <TaskCheckmark
           completed={task.completed}

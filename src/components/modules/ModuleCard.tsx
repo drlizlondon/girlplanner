@@ -44,9 +44,9 @@ export function ModuleCard({
           )}
           <div className="min-w-0">
             {kicker && (
-              <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-0.5">{kicker}</div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/90 mb-1">{kicker}</div>
             )}
-            <h2 className="font-serif-display text-[22px] leading-tight text-foreground truncate">{title}</h2>
+            <h2 className="font-serif-display text-2xl font-semibold leading-tight text-foreground truncate">{title}</h2>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -54,9 +54,9 @@ export function ModuleCard({
           {href && (
             <Link
               to={href}
-              className="inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
             >
-              {hrefLabel} <ArrowUpRight className="h-3 w-3" />
+              {hrefLabel} <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           )}
         </div>
@@ -100,6 +100,6 @@ export function QuickAdd({
 
 export function EmptyHint({ children }: { children: ReactNode }) {
   return (
-    <div className="text-[13px] text-muted-foreground/80 italic py-3 px-1 leading-relaxed">{children}</div>
+    <div className="text-sm text-muted-foreground italic py-3 px-1 leading-relaxed">{children}</div>
   );
 }

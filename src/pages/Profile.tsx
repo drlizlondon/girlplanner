@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
+import { VoiceSetupGuide } from "@/components/VoiceSetupGuide";
 
 const Profile = () => {
   const { isAuthenticated, name: loadedName, photoUrl: loadedPhotoUrl, email, loading, refresh } = useProfile();
@@ -262,6 +263,10 @@ const Profile = () => {
               </Button>
             )}
           </div>
+        </div>
+
+        <div className="mt-8">
+          <VoiceSetupGuide />
         </div>
       </div>
     </div>
