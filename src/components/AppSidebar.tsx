@@ -44,8 +44,8 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight text-foreground">Girl Planner</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Founder OS</span>
+              <span className="text-sm font-semibold tracking-tight text-foreground">GirlPlanner</span>
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Daily Planner</span>
             </div>
           )}
         </NavLink>

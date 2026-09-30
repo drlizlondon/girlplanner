@@ -16,7 +16,7 @@ export default function CommandCentre() {
           {format(new Date(), "EEEE • d MMMM yyyy")}
         </div>
         <h1 className="mt-1 text-4xl sm:text-5xl font-serif-display text-foreground leading-tight">
-          Girl Planner
+          GirlPlanner
         </h1>
         <p className="mt-2 text-base sm:text-lg text-muted-foreground max-w-2xl">
           Executive voice-to-agenda operating system. Speak your mind during the day; wake up to an actionable, prioritized plan.

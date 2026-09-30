@@ -157,36 +157,10 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {(suggestion.type === "priority_action" || suggestion.type === "follow_up") && (
-          <Button size="sm" onClick={addToAgenda}>
-            <Plus className="h-3.5 w-3.5 mr-1" />
-            {suggestion.type === "follow_up" ? "Convert to Task" : "Add to Agenda"}
-          </Button>
-        )}
-        {(suggestion.type === "priority_action" || suggestion.type === "follow_up") && (
-          <Button size="sm" variant="outline" onClick={addToFocus}>
-            <Star className="h-3.5 w-3.5 mr-1" />
-            Add to Focus
-          </Button>
-        )}
-        <Button size="sm" variant="outline" onClick={convertToProject}>
-          <Briefcase className="h-3.5 w-3.5 mr-1" />
-          Convert to Project
+        <Button size="sm" onClick={addToAgenda}>
+          <Plus className="h-3.5 w-3.5 mr-1" />
+          Add to Agenda
         </Button>
-        {suggestion.type !== "idea" && (
-          <Button size="sm" variant="outline" onClick={saveAsIdea}>
-            <Lightbulb className="h-3.5 w-3.5 mr-1" />
-            {suggestion.type === "insight" || suggestion.type === "question" ? "Save" : "Save as Idea"}
-          </Button>
-        )}
-        {suggestion.type === "idea" && (
-          <>
-            <Button size="sm" onClick={saveAsIdea}>
-              <Lightbulb className="h-3.5 w-3.5 mr-1" />
-              Save Idea
-            </Button>
-          </>
-        )}
         <Button size="sm" variant="ghost" onClick={archive} className="text-muted-foreground hover:text-foreground">
           <Archive className="h-3.5 w-3.5 mr-1" />
           Archive

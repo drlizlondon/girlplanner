@@ -1,7 +1,7 @@
 {
-  "name": "planethave — Founder OS",
-  "short_name": "planethave",
-  "description": "A calm, modular executive operating system for founders: agenda, inbox, ideas, opportunities.",
+  "name": "GirlPlanner",
+  "short_name": "GirlPlanner",
+  "description": "Executive voice-to-agenda daily planner.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

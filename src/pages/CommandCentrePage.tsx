@@ -35,9 +35,9 @@ export default function CommandCentrePage() {
           <div className="mx-auto mb-6 h-12 w-12 rounded-xl border border-primary/40 bg-primary/10 flex items-center justify-center">
             <Flower2 className="h-5 w-5 text-primary" />
           </div>
-          <div className="text-[10px] uppercase tracking-[0.22em] text-primary/80">Founder OS</div>
-          <h1 className="mt-2 text-3xl font-serif-display text-foreground">Command Centre</h1>
-          <p className="mt-3 text-muted-foreground">A calm operational layer between thought and commitment.</p>
+          <div className="text-[10px] uppercase tracking-[0.22em] text-primary/80">GirlPlanner</div>
+          <h1 className="mt-2 text-3xl font-serif-display text-foreground">Welcome to GirlPlanner</h1>
+          <p className="mt-3 text-muted-foreground">Voice-to-agenda daily planning. Capture during the day, wake up to a clear plan.</p>
           <div className="mt-8 space-y-3">
             <Button className="w-full" onClick={() => setShowAuth(true)}>
               <User className="h-4 w-4 mr-2" /> Sign in to sync
