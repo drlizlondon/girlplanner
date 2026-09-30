@@ -75,7 +75,7 @@ export const TaskRow = ({
       </TableCell>
       <TableCell>
         <select
-          className={`w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm ${getPriorityColor(
+          className={`w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm ${getPriorityColor(
             task.priority
           )}`}
           value={task.priority}
@@ -85,9 +85,9 @@ export const TaskRow = ({
             })
           }
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="low" className="bg-popover text-foreground">Low</option>
+          <option value="medium" className="bg-popover text-foreground">Medium</option>
+          <option value="high" className="bg-popover text-foreground">High</option>
         </select>
       </TableCell>
       <TableCell>
@@ -101,7 +101,7 @@ export const TaskRow = ({
           variant="ghost"
           size="icon"
           onClick={() => onDeleteTask(task.id)}
-          className="hover:bg-red-100 hover:text-red-500"
+          className="hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:text-red-700"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

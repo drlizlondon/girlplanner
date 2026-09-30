@@ -51,10 +51,10 @@ export const TaskTable = ({
   };
 
   return (
-    <div className="rounded-md border overflow-x-auto">
+    <div className="rounded-xl border border-border overflow-x-auto bg-card shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="border-border hover:bg-transparent">
             <TableHead className="w-12">Status</TableHead>
             <TableHead className="flex items-center gap-2">
               Task

@@ -122,15 +122,15 @@ const Customise = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-2 sm:p-4 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-full bg-gradient-to-br from-pink-50/70 via-purple-50/30 to-background dark:from-background dark:via-background dark:to-background p-2 sm:p-4 lg:p-8 transition-colors">
+      <div className="max-w-6xl mx-auto space-y-4">
         <Header onSignOut={handleSignOut} />
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
-          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 font-bold text-center pb-2">
+        <div className="bg-card text-card-foreground border border-border rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
+          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8 text-center">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold pb-2">
               Customise Task Types
             </h2>
-            <p className="text-center text-gray-600 text-sm sm:text-base">Manage your custom task categories</p>
+            <p className="text-muted-foreground text-sm sm:text-base">Manage your custom task categories</p>
           </div>
           
           <div className="space-y-4 sm:space-y-6">

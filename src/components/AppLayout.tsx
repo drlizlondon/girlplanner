@@ -5,6 +5,7 @@ import { AccountMenu } from "@/components/AccountMenu";
 import { useEffect, useState } from "react";
 import { dataService } from "@/lib/dataService";
 import { Cloud, HardDrive } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function AppLayout() {
   const { pathname } = useLocation();
@@ -29,7 +30,7 @@ export default function AppLayout() {
                 {pathname === "/" ? "Command Centre" : pathname.replace("/", "").replace("-", " ") || "Workspace"}
               </span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 sm:gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
                 {storage === "supabase" ? (
                   <>
@@ -43,6 +44,7 @@ export default function AppLayout() {
                   </>
                 )}
               </div>
+              <ThemeToggle compact />
               <AccountMenu />
             </div>
           </header>

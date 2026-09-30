@@ -94,40 +94,40 @@ const Agenda = () => {
   });
 
   const BasicTable = () => (
-    <div className="rounded-md border overflow-x-auto">
+    <div className="rounded-xl border border-border overflow-x-auto bg-card shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-8 sm:w-12 text-xs sm:text-sm">Done</TableHead>
-            <TableHead className="text-xs sm:text-sm">Task</TableHead>
-            <TableHead className="w-20 sm:w-24 text-xs sm:text-sm">Priority</TableHead>
-            <TableHead className="w-16 sm:w-20 text-xs sm:text-sm">
-              <Trash2 className="h-4 w-4 mx-auto text-gray-400" />
+          <TableRow className="border-border hover:bg-transparent">
+            <TableHead className="w-8 sm:w-12 text-xs sm:text-sm text-muted-foreground font-semibold">Done</TableHead>
+            <TableHead className="text-xs sm:text-sm text-muted-foreground font-semibold">Task</TableHead>
+            <TableHead className="w-20 sm:w-24 text-xs sm:text-sm text-muted-foreground font-semibold">Priority</TableHead>
+            <TableHead className="w-16 sm:w-20 text-xs sm:text-sm text-center">
+              <Trash2 className="h-4 w-4 mx-auto text-muted-foreground" />
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedTasks.map((task) => (
-            <TableRow key={task.id}>
+            <TableRow key={task.id} className="border-border hover:bg-muted/40 transition-colors">
               <TableCell className="p-2 sm:p-4">
                 <div className="flex items-center justify-center">
                   <button
                     onClick={() => completeTask(task.id, true)}
-                    className="h-4 w-4 sm:h-5 sm:w-5 rounded border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
+                    className="h-5 w-5 rounded border border-input bg-background hover:bg-muted flex items-center justify-center transition-colors"
                   >
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-transparent hover:text-gray-400" />
+                    <Check className="h-3.5 w-3.5 text-transparent hover:text-muted-foreground" />
                   </button>
                 </div>
               </TableCell>
               <TableCell 
-                className="p-2 sm:p-4 text-xs sm:text-sm"
+                className="p-2 sm:p-4 text-xs sm:text-sm font-medium text-foreground"
                 onDoubleClick={(e) => {
                   const target = e.currentTarget;
                   const currentText = task.title;
                   
                   const input = document.createElement('input');
                   input.value = currentText;
-                  input.className = 'w-full px-2 py-1 text-xs sm:text-sm border rounded';
+                  input.className = 'w-full px-2 py-1 text-xs sm:text-sm border border-input rounded bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring';
                   
                   target.innerHTML = '';
                   target.appendChild(input);
@@ -162,23 +162,23 @@ const Agenda = () => {
               </TableCell>
               <TableCell className="p-2 sm:p-4">
                 <select
-                  className={`w-full rounded-md border border-input bg-transparent px-2 py-1 text-xs sm:text-sm shadow-sm ${getPriorityColor(task.priority)}`}
+                  className={`w-full rounded-md border border-input bg-background text-foreground px-2 py-1 text-xs sm:text-sm shadow-sm ${getPriorityColor(task.priority)}`}
                   value={task.priority}
                   onChange={(e) => updateTask(task.id, { priority: e.target.value as Priority })}
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Med</option>
-                  <option value="high">High</option>
+                  <option value="low" className="bg-popover text-foreground">Low</option>
+                  <option value="medium" className="bg-popover text-foreground">Med</option>
+                  <option value="high" className="bg-popover text-foreground">High</option>
                 </select>
               </TableCell>
               <TableCell className="p-2 sm:p-4">
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={() => deleteTask(task.id)}
-                  className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-500/10"
                 >
-                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mx-auto" />
                 </Button>
               </TableCell>
             </TableRow>
@@ -189,24 +189,24 @@ const Agenda = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-2 sm:p-4 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-full bg-gradient-to-br from-pink-50/70 via-purple-50/30 to-background dark:from-background dark:via-background dark:to-background p-2 sm:p-4 lg:p-8 transition-colors">
+      <div className="max-w-6xl mx-auto space-y-4">
         <Header onSignOut={handleSignOut} showSignOut={isAuthenticated} />
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
+        <div className="bg-card text-card-foreground border border-border shadow-xl rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Storage Status */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-muted/50 rounded-lg p-3 sm:p-4 gap-2 sm:gap-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-muted/40 border border-border/50 rounded-lg p-3 sm:p-4 gap-2 sm:gap-0">
             <div className="flex items-center gap-2">
               {storageType === 'supabase' ? (
                 <>
                   <Cloud className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Synced to Cloud</span>
+                  <span className="text-sm font-medium text-foreground">Synced to Cloud</span>
                   <span className="hidden sm:inline text-xs text-muted-foreground">(Your tasks are saved to your account)</span>
                 </>
               ) : (
                 <>
                   <HardDrive className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Local Storage</span>
+                  <span className="text-sm font-medium text-foreground">Local Storage</span>
                   <span className="hidden sm:inline text-xs text-muted-foreground">(Tasks saved on this device only)</span>
                 </>
               )}
@@ -225,15 +225,13 @@ const Agenda = () => {
             )}
           </div>
 
-          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 font-bold text-center pb-2">
+          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8 text-center">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold pb-2">
               My Agenda
             </h2>
-            <p className="text-center text-gray-600 text-sm sm:text-base">Your personal task manager</p>
+            <p className="text-muted-foreground text-sm sm:text-base">Your personal task manager</p>
           </div>
           <TaskForm onAddTask={addTask} />
-          
-          
           
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3 sm:gap-4">
             <div className="flex gap-2 sm:gap-4">
@@ -282,7 +280,7 @@ const Agenda = () => {
             <Link to="/customise">
               <Button
                 variant="link"
-                className="text-purple-600 hover:text-purple-700"
+                className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
               >
                 <Settings className="h-4 w-4 mr-2" />
                 Customise Task Types
