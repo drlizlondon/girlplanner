@@ -225,11 +225,14 @@ const Agenda = () => {
             )}
           </div>
 
-          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8 text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold pb-2">
-              My Agenda
-            </h2>
-            <p className="text-muted-foreground text-sm sm:text-base">Your personal task manager</p>
+          <div className="space-y-1.5 mb-6 sm:mb-8 text-center">
+            <div className="text-xs font-semibold uppercase tracking-wider text-primary">Daily Focus</div>
+            <h1 className="text-3xl sm:text-4xl font-serif-display font-semibold text-foreground">
+              Today's Agenda
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto">
+              Your personal operational checklist. Add, prioritize, and complete your tasks.
+            </p>
           </div>
           <TaskForm onAddTask={addTask} />
           

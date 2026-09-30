@@ -166,11 +166,12 @@ const Profile = () => {
       <div className="max-w-6xl mx-auto space-y-4">
         <Header onSignOut={handleSignOut} showSignOut={true} />
         <div className="max-w-2xl mx-auto bg-card text-card-foreground border border-border rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
-          <div className="text-center mb-4 sm:mb-6 lg:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold text-center pb-2">
+          <div className="space-y-1.5 mb-6 sm:mb-8 text-center">
+            <div className="text-xs font-semibold uppercase tracking-wider text-primary">Account</div>
+            <h1 className="text-3xl sm:text-4xl font-serif-display font-semibold text-foreground">
               Welcome, {name || "Friend"}
             </h1>
-            <p className="text-center text-muted-foreground text-sm sm:text-base">Manage your profile settings</p>
+            <p className="text-center text-muted-foreground text-sm sm:text-base">Manage your profile & sync settings</p>
           </div>
 
           <div className="space-y-6 sm:space-y-8">

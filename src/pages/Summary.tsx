@@ -41,11 +41,12 @@ const Summary = () => {
       <div className="max-w-6xl mx-auto space-y-4">
         <Header onSignOut={handleSignOut} />
         <div className="bg-card text-card-foreground border border-border rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
-          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8 text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold pb-2">
+          <div className="space-y-1.5 mb-6 sm:mb-8 text-center">
+            <div className="text-xs font-semibold uppercase tracking-wider text-primary">Archive</div>
+            <h1 className="text-3xl sm:text-4xl font-serif-display font-semibold text-foreground">
               Completed Tasks
-            </h2>
-            <p className="text-muted-foreground text-sm sm:text-base">Review your accomplishments</p>
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base">Review and celebrate your accomplishments</p>
           </div>
           {selectedTasks.size > 0 && (
             <div className="flex justify-end mb-4">

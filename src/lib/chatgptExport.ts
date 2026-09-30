@@ -4,7 +4,7 @@ import { format } from "date-fns";
 export function buildChatGPTExport(tasks: Task[]): string {
   const date = format(new Date(), "yyyy-MM-dd");
   const header = [
-    "# Founder OS — Task Processing Request",
+    "# GirlPlanner — Task Processing Request",
     `Date: ${date}`,
     "Context: Current Agenda export",
     `Selected items: ${tasks.length}`,

@@ -126,10 +126,11 @@ const Customise = () => {
       <div className="max-w-6xl mx-auto space-y-4">
         <Header onSignOut={handleSignOut} />
         <div className="bg-card text-card-foreground border border-border rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
-          <div className="space-y-2 mb-4 sm:mb-6 lg:mb-8 text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold pb-2">
+          <div className="space-y-1.5 mb-6 sm:mb-8 text-center">
+            <div className="text-xs font-semibold uppercase tracking-wider text-primary">Preferences</div>
+            <h1 className="text-3xl sm:text-4xl font-serif-display font-semibold text-foreground">
               Customise Task Types
-            </h2>
+            </h1>
             <p className="text-muted-foreground text-sm sm:text-base">Manage your custom task categories</p>
           </div>
           

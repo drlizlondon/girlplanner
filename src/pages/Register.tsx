@@ -75,11 +75,12 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-semibold text-gray-800">Create Account</h1>
-          <p className="text-gray-600">Sign up to get started</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50/70 via-purple-50/30 to-background dark:from-background dark:via-background dark:to-background p-4 transition-colors">
+      <div className="w-full max-w-md p-6 sm:p-8 space-y-6 bg-card text-card-foreground border border-border rounded-2xl shadow-xl">
+        <div className="text-center space-y-1.5">
+          <div className="text-xs font-semibold uppercase tracking-wider text-primary">Get Started</div>
+          <h1 className="text-3xl font-serif-display font-semibold text-foreground">Create Account</h1>
+          <p className="text-sm text-muted-foreground">Sign up to sync your GirlPlanner across devices</p>
         </div>
 
         <Form {...form}>
