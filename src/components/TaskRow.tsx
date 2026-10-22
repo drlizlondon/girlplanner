@@ -1,8 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
-import { TableCell, TableRow } from "@/components/ui/table";
 import { TaskTypeSelect } from "@/components/TaskTypeSelect";
 import { Task } from "@/types/task";
 import { TaskCheckmark } from "./task/TaskCheckmark";
@@ -28,6 +26,8 @@ const getPriorityColor = (priority: Task["priority"]) => {
   }
 };
 
+// Advanced view: one card per task. The title gets its own line; priority,
+// type, due date and notes sit underneath, and thoughts get a full-width box.
 export const TaskRow = ({
   task,
   onTaskCompletion,
@@ -35,47 +35,38 @@ export const TaskRow = ({
   onDeleteTask,
 }: TaskRowProps) => {
   return (
-    <TableRow className={`transition-all duration-300 ${task.completed ? 'opacity-70 line-through' : ''}`}>
-      <TableCell>
-        <TaskCheckmark
-          completed={task.completed}
-          onCheckedChange={(checked) => onTaskCompletion(task.id, checked)}
-        />
-      </TableCell>
-      <TableCell>
-        <TaskTitle
-          title={task.title}
-          onUpdate={(title) => onUpdateTask(task.id, { title })}
-        />
-      </TableCell>
-      <TableCell>
-        <TaskAdditionalInfo
-          taskId={task.id}
-          additionalInfo={task.additional_info || ""}
-          onUpdate={(additional_info) => onUpdateTask(task.id, { additional_info })}
-        />
-      </TableCell>
-      <TableCell>
-        <Textarea
-          placeholder="Your thoughts..."
-          value={task.thoughts}
-          onChange={(e) =>
-            onUpdateTask(task.id, { thoughts: e.target.value })
-          }
-          className="min-h-[40px] resize-none"
-        />
-      </TableCell>
-      <TableCell>
-        <TaskTypeSelect
-          value={task.type}
-          onValueChange={(value) =>
-            onUpdateTask(task.id, { type: value })
-          }
-        />
-      </TableCell>
-      <TableCell>
+    <li
+      data-testid="task-card"
+      className={`px-4 py-3 sm:px-5 transition-all duration-300 ${task.completed ? "opacity-70" : ""}`}
+    >
+      <div className="flex items-start gap-3">
+        <div className="pt-0.5">
+          <TaskCheckmark
+            completed={task.completed}
+            onCheckedChange={(checked) => onTaskCompletion(task.id, checked)}
+          />
+        </div>
+        <div className={`flex-1 min-w-0 pt-1 ${task.completed ? "line-through" : ""}`}>
+          <TaskTitle
+            title={task.title}
+            onUpdate={(title) => onUpdateTask(task.id, { title })}
+          />
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Delete task"
+          onClick={() => onDeleteTask(task.id)}
+          className="shrink-0 hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:text-red-700"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="mt-2 ml-9 flex flex-wrap items-center gap-2">
         <select
-          className={`w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm ${getPriorityColor(
+          aria-label="Priority"
+          className={`h-9 rounded-md border border-input bg-background px-3 text-sm shadow-sm ${getPriorityColor(
             task.priority
           )}`}
           value={task.priority}
@@ -85,27 +76,40 @@ export const TaskRow = ({
             })
           }
         >
-          <option value="low" className="bg-popover text-foreground">Low</option>
-          <option value="medium" className="bg-popover text-foreground">Medium</option>
-          <option value="high" className="bg-popover text-foreground">High</option>
+          <option value="low" className="bg-popover text-foreground">Low priority</option>
+          <option value="medium" className="bg-popover text-foreground">Medium priority</option>
+          <option value="high" className="bg-popover text-foreground">High priority</option>
         </select>
-      </TableCell>
-      <TableCell>
+        <TaskTypeSelect
+          value={task.type}
+          onValueChange={(value) => onUpdateTask(task.id, { type: value })}
+        />
         <TaskDueDate
           dueDate={task.dueDate}
           onUpdate={(dueDate) => onUpdateTask(task.id, { dueDate })}
         />
-      </TableCell>
-      <TableCell>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDeleteTask(task.id)}
-          className="hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:text-red-700"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </TableCell>
-    </TableRow>
+        <TaskAdditionalInfo
+          taskId={task.id}
+          additionalInfo={task.additional_info || ""}
+          onUpdate={(additional_info) => onUpdateTask(task.id, { additional_info })}
+        />
+      </div>
+
+      {task.additional_info ? (
+        <p className="mt-2 ml-9 text-sm text-muted-foreground whitespace-pre-wrap break-words">
+          {task.additional_info}
+        </p>
+      ) : null}
+
+      <div className="mt-2 ml-9">
+        <Textarea
+          aria-label="Thoughts"
+          placeholder="Your thoughts..."
+          value={task.thoughts}
+          onChange={(e) => onUpdateTask(task.id, { thoughts: e.target.value })}
+          className="min-h-[40px] resize-y text-sm"
+        />
+      </div>
+    </li>
   );
 };

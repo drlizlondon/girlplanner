@@ -79,7 +79,7 @@ const Register = () => {
       <div className="w-full max-w-md p-6 sm:p-8 space-y-6 bg-card text-card-foreground border border-border rounded-2xl shadow-xl">
         <div className="text-center space-y-1.5">
           <div className="text-xs font-semibold uppercase tracking-wider text-primary">Get Started</div>
-          <h1 className="text-3xl font-serif-display font-semibold text-foreground">Create Account</h1>
+          <h1 className="text-3xl font-semibold text-foreground">Create Account</h1>
           <p className="text-sm text-muted-foreground">Sign up to sync your GirlPlanner across devices</p>
         </div>
 

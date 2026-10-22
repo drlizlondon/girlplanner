@@ -1,12 +1,4 @@
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { TaskRow } from "./TaskRow";
 import { Task } from "@/types/task";
 import { ArrowUpDown } from "lucide-react";
@@ -50,56 +42,46 @@ export const TaskTable = ({
     }
   };
 
+  const sortLabels: Record<SortField, string> = {
+    created_at: "Date added",
+    due_date: "Due date",
+    priority: "Priority",
+    type: "Type",
+  };
+
   return (
-    <div className="rounded-xl border border-border overflow-x-auto bg-card shadow-sm">
-      <Table>
-        <TableHeader>
-          <TableRow className="border-border hover:bg-transparent">
-            <TableHead className="w-12">Status</TableHead>
-            <TableHead className="flex items-center gap-2">
-              Task
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem onClick={() => handleSort('created_at')}>
-                    Date Added {sortField === 'created_at' && (sortOrder === 'asc' ? '↑' : '↓')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSort('due_date')}>
-                    Due Date {sortField === 'due_date' && (sortOrder === 'asc' ? '↑' : '↓')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSort('priority')}>
-                    Priority {sortField === 'priority' && (sortOrder === 'asc' ? '↑' : '↓')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSort('type')}>
-                    Type {sortField === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableHead>
-            <TableHead>Notes</TableHead>
-            <TableHead>Thoughts</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Priority</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead className="w-[100px]">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tasks.map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              onTaskCompletion={onTaskCompletion}
-              onUpdateTask={onUpdateTask}
-              onDeleteTask={onDeleteTask}
-            />
-          ))}
-        </TableBody>
-      </Table>
+    <div className="rounded-xl border border-border bg-card shadow-sm">
+      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2 sm:px-5">
+        <span className="text-sm font-medium text-muted-foreground">
+          {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
+        </span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="gap-2 text-sm">
+              <ArrowUpDown className="h-4 w-4" />
+              Sort: {sortLabels[sortField]} {sortOrder === "asc" ? "↑" : "↓"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {(Object.keys(sortLabels) as SortField[]).map((field) => (
+              <DropdownMenuItem key={field} onClick={() => handleSort(field)}>
+                {sortLabels[field]} {sortField === field && (sortOrder === "asc" ? "↑" : "↓")}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <ul className="divide-y divide-border">
+        {tasks.map((task) => (
+          <TaskRow
+            key={task.id}
+            task={task}
+            onTaskCompletion={onTaskCompletion}
+            onUpdateTask={onUpdateTask}
+            onDeleteTask={onDeleteTask}
+          />
+        ))}
+      </ul>
     </div>
   );
 };

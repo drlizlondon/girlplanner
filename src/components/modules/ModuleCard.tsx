@@ -46,7 +46,7 @@ export function ModuleCard({
             {kicker && (
               <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/90 mb-1">{kicker}</div>
             )}
-            <h2 className="font-serif-display text-2xl font-semibold leading-tight text-foreground truncate">{title}</h2>
+            <h2 className="font-serif-display text-[22px] leading-tight text-foreground truncate">{title}</h2>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">

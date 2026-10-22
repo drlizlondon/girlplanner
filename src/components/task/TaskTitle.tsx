@@ -23,7 +23,7 @@ export const TaskTitle = ({ title, onUpdate }: TaskTitleProps) => {
     />
   ) : (
     <span 
-      className="font-normal truncate max-w-[200px] cursor-pointer text-foreground hover:text-purple-600 dark:hover:text-purple-400"
+      className="block font-normal break-words cursor-pointer text-foreground hover:text-purple-600 dark:hover:text-purple-400"
       onClick={toggleEdit}
     >
       {title}

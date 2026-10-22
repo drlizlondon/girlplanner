@@ -21,8 +21,8 @@ export default {
     extend: {
       fontFamily: {
         'dancing-script': ['"Dancing Script"', 'cursive'],
-        'sans': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        'serif-display': ['"Instrument Serif"', 'Georgia', 'serif'],
+        'sans': ['ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+        'serif-display': ['Georgia', '"Times New Roman"', 'serif'],
       },
       colors: {
         border: 'hsl(var(--border))',

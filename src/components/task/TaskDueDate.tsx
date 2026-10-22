@@ -27,7 +27,7 @@ export const TaskDueDate = ({ dueDate, onUpdate }: TaskDueDateProps) => {
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {dueDate ? (
-            format(dueDate, "MM/dd/yy")
+            format(dueDate, "d MMM yyyy")
           ) : (
             <span>Set due date</span>
           )}
