@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Task } from "@/types/task";
+import { Task, Priority } from "@/types/task";
 import { useToast } from "@/hooks/use-toast";
 import { dataService } from "@/lib/dataService";
 
@@ -33,11 +33,11 @@ export const useTasks = () => {
     }
   };
 
-  const addTask = async (title: string) => {
+  const addTask = async (title: string, priority: Priority = "medium", dueDate: Date | null = null) => {
     if (!title.trim()) return;
 
     try {
-      const createdTask = await dataService.addTask(title);
+      const createdTask = await dataService.addTask(title, priority, dueDate ? dueDate.toISOString() : null);
       const formattedTask: Task = {
         ...createdTask,
         dueDate: createdTask.due_date ? new Date(createdTask.due_date) : undefined,
@@ -45,7 +45,6 @@ export const useTasks = () => {
       };
 
       setTasks([formattedTask, ...tasks]);
-      toast({ title: "Added to Current Agenda", description: title });
     } catch (error) {
       console.error('Error adding task:', error);
       toast({

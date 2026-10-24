@@ -48,7 +48,7 @@ export class DataService {
     }
   }
 
-  async addTask(title: string): Promise<any> {
+  async addTask(title: string, priority: "low" | "medium" | "high" = "medium", dueDate: string | null = null): Promise<any> {
     if (this.isAuthenticated) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -58,7 +58,8 @@ export class DataService {
         .insert([{
           title,
           type: '_none',
-          priority: 'low',
+          priority,
+          due_date: dueDate,
           additional_info: '',
           thoughts: '',
           completed: false,
@@ -71,7 +72,7 @@ export class DataService {
       if (error) throw error;
       return data;
     } else {
-      return localStorageAPI.addTask(title);
+      return localStorageAPI.addTask(title, priority, dueDate);
     }
   }
 

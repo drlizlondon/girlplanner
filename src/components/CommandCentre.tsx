@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Mic, ArrowRight, Sparkles } from "lucide-react";
+import { Mic, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CurrentAgendaModule } from "./modules/CurrentAgendaModule";
 import { ProcessingInboxModule } from "./modules/ProcessingInboxModule";
@@ -19,7 +19,7 @@ export default function CommandCentre() {
           GirlPlanner
         </h1>
         <p className="mt-2 text-base sm:text-lg text-muted-foreground max-w-2xl">
-          Executive voice-to-agenda operating system. Speak your mind during the day; wake up to an actionable, prioritized plan.
+          Give every task a priority and a deadline, then sort by either in one tap.
         </p>
       </div>
 
@@ -32,14 +32,11 @@ export default function CommandCentre() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground text-sm sm:text-base">
-                Voice-to-Planner Automation (Free Gemini AI)
+                Add tasks by voice
               </h3>
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-primary/15 text-primary px-2 py-0.5 rounded-full">
-                <Sparkles className="h-3 w-3" /> 4 Easy Steps
-              </span>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-              Set up your iPhone or phone to dictate messy thoughts and wake up to neatly structured daily tasks.
+              Dictate into Notes during the day, then paste the list into Paste notes in the evening.
             </p>
           </div>
         </div>
@@ -47,7 +44,7 @@ export default function CommandCentre() {
           to="/guide"
           className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs sm:text-sm font-semibold hover:opacity-90 shadow-sm transition-opacity"
         >
-          View Setup Guide <ArrowRight className="h-4 w-4" />
+          See how <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 

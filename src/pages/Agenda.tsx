@@ -5,23 +5,27 @@ import { TaskForm } from "@/components/TaskForm";
 import { useTasks } from "@/hooks/useTasks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, User, Cloud, HardDrive, Trash2, Settings } from "lucide-react";
+import { Check, Cloud, HardDrive, Trash2, Settings } from "lucide-react";
+import { format } from "date-fns";
 import { Task, Priority } from "@/types/task";
 import { Link } from "react-router-dom";
 import { AuthModal } from "@/components/AuthModal";
 import { dataService } from "@/lib/dataService";
 import { CompletedTasksWrapper } from "@/components/CompletedTasksWrapper";
 
-const Agenda = () => {
+const PRIORITY_RANK = { high: 3, medium: 2, low: 1 };
+
+const Agenda = ({ hero = false }: { hero?: boolean }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const { tasks, addTask, completeTask, updateTask, deleteTask } = useTasks();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isAdvancedView, setIsAdvancedView] = useState(false);
-  const [sortField, setSortField] = useState<'created_at' | 'due_date' | 'priority' | 'type'>('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<'created_at' | 'due_date' | 'priority' | 'type'>('due_date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [storageType, setStorageType] = useState<'local' | 'supabase'>('local');
@@ -82,7 +86,9 @@ const Agenda = () => {
       case 'due_date':
         const aDate = a.dueDate?.getTime() || Number.MAX_SAFE_INTEGER;
         const bDate = b.dueDate?.getTime() || Number.MAX_SAFE_INTEGER;
-        return multiplier * (aDate - bDate);
+        if (aDate !== bDate) return multiplier * (aDate - bDate);
+        // Same deadline (or none): most important first.
+        return PRIORITY_RANK[b.priority] - PRIORITY_RANK[a.priority];
       case 'priority':
         const priorityOrder = { high: 3, medium: 2, low: 1 };
         return multiplier * (priorityOrder[a.priority] - priorityOrder[b.priority]);
@@ -119,8 +125,8 @@ const Agenda = () => {
                   </button>
                 </div>
               </TableCell>
-              <TableCell 
-                className="p-2 sm:p-4 text-xs sm:text-sm font-medium text-foreground"
+              <TableCell className="p-2 sm:p-4 text-sm font-medium text-foreground">
+              <div
                 onDoubleClick={(e) => {
                   const target = e.currentTarget;
                   const currentText = task.title;
@@ -159,6 +165,12 @@ const Agenda = () => {
                 }}
               >
                 {task.title}
+              </div>
+              {task.dueDate && (
+                <div className="mt-0.5 text-xs font-normal text-muted-foreground">
+                  Due {format(task.dueDate, "d MMM")}
+                </div>
+              )}
               </TableCell>
               <TableCell className="p-2 sm:p-4">
                 <select
@@ -189,49 +201,36 @@ const Agenda = () => {
   );
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-pink-50/70 via-purple-50/30 to-background dark:from-background dark:via-background dark:to-background p-2 sm:p-4 lg:p-8 transition-colors">
+    <div className="min-h-full bg-background p-2 sm:p-4 lg:p-8 transition-colors">
       <div className="max-w-6xl mx-auto space-y-4">
         <Header onSignOut={handleSignOut} showSignOut={isAuthenticated} />
 
-        <div className="bg-card text-card-foreground border border-border shadow-xl rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 lg:space-y-8">
-          {/* Storage Status */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-muted/40 border border-border/50 rounded-lg p-3 sm:p-4 gap-2 sm:gap-0">
-            <div className="flex items-center gap-2">
-              {storageType === 'supabase' ? (
-                <>
-                  <Cloud className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Synced to Cloud</span>
-                  <span className="hidden sm:inline text-xs text-muted-foreground">(Your tasks are saved to your account)</span>
-                </>
-              ) : (
-                <>
-                  <HardDrive className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">Local Storage</span>
-                  <span className="hidden sm:inline text-xs text-muted-foreground">(Tasks saved on this device only)</span>
-                </>
-              )}
+        <div className="bg-card text-card-foreground sm:border sm:border-border rounded-xl sm:rounded-2xl p-2 sm:p-4 lg:p-6 space-y-6">
+          {hero ? (
+            <div className="text-center space-y-3 pt-4 pb-2">
+              <h1 className="text-3xl sm:text-4xl font-serif-display text-foreground leading-tight">
+                Your to-do list, <span className="font-dancing-script text-purple-700 dark:text-purple-300 font-bold text-4xl sm:text-5xl">sorted</span>.
+              </h1>
+              <p className="text-muted-foreground text-base max-w-md mx-auto">
+                Give every task a priority and a deadline, then sort by either in one tap.
+              </p>
+              <div className="pt-1">
+                <Button onClick={() => inputRef.current?.focus()}>Start my list</Button>
+                <p className="mt-2 text-sm text-muted-foreground">Free. No sign-up. Saved on this phone.</p>
+                {!isAuthenticated && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Already have an account?{" "}
+                    <button type="button" className="underline text-primary" onClick={() => setShowAuthModal(true)}>Sign in</button>
+                  </p>
+                )}
+              </div>
             </div>
-            {!isAuthenticated && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowAuthModal(true)}
-                className="w-full sm:w-auto"
-              >
-                <User className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Sign In to Sync</span>
-                <span className="sm:hidden">Sign In</span>
-              </Button>
-            )}
-          </div>
-
-          <div className="space-y-1.5 mb-6 sm:mb-8 text-center">
+          ) : (
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold text-center pb-2">
-              My Agenda
+              My list
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base">Your personal task manager</p>
-          </div>
-          <TaskForm onAddTask={addTask} />
+          )}
+          <TaskForm ref={inputRef} onAddTask={addTask} />
           
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3 sm:gap-4">
             <div className="flex gap-2 sm:gap-4">
@@ -246,13 +245,12 @@ const Agenda = () => {
               </Button>
             </div>
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => setIsAdvancedView(!isAdvancedView)}
               size="sm"
               className="text-xs sm:text-sm"
             >
-              <span className="hidden sm:inline">{isAdvancedView ? "Switch to Basic View" : "Switch to Advanced View"}</span>
-              <span className="sm:hidden">{isAdvancedView ? "Basic" : "Advanced"}</span>
+              {isAdvancedView ? "Hide details" : "Show details"}
             </Button>
           </div>
           
@@ -274,6 +272,18 @@ const Agenda = () => {
           )}
           
           {showCompleted && <CompletedTasksWrapper />}
+
+          <p className="flex flex-wrap items-center justify-center gap-x-2 text-xs text-muted-foreground">
+            {storageType === 'supabase' ? (
+              <><Cloud className="h-3.5 w-3.5" /> Synced to your account.</>
+            ) : (
+              <><HardDrive className="h-3.5 w-3.5" /> Saved on this device only.
+                {!hero && (
+                  <button type="button" className="underline" onClick={() => setShowAuthModal(true)}>Sign in to sync</button>
+                )}
+              </>
+            )}
+          </p>
 
           {/* Customise Link */}
           <div className="flex justify-center pt-4">

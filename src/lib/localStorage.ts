@@ -84,16 +84,16 @@ export const localStorageAPI = {
     return data ? JSON.parse(data) : [];
   },
 
-  addTask: (title: string): LocalTask => {
+  addTask: (title: string, priority: "low" | "medium" | "high" = "medium", dueDate: string | null = null): LocalTask => {
     const tasks = localStorageAPI.getTasks();
     const newTask: LocalTask = {
       id: generateId(),
       title,
       type: "_none",
-      priority: "low",
+      priority,
       additional_info: "",
       thoughts: "",
-      due_date: null,
+      due_date: dueDate,
       completed: false,
       completed_at: null,
       created_at: new Date().toISOString(),

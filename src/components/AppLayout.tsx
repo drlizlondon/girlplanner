@@ -27,7 +27,7 @@ export default function AppLayout() {
             <div className="flex items-center gap-2">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
               <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground hidden sm:inline">
-                {pathname === "/" ? "Command Centre" : pathname.replace("/", "").replace("-", " ") || "Workspace"}
+                {pathname === "/" ? "Today" : pathname.replace("/", "").replace("-", " ") || "Workspace"}
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 text-xs text-muted-foreground">

@@ -144,7 +144,7 @@ const Customise = () => {
               />
               <Button
                 onClick={handleAddType}
-                className="bg-gradient-to-r from-pink-400 to-purple-400 w-full sm:w-auto"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Add Type</span>

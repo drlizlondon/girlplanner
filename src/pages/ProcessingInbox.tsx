@@ -7,37 +7,13 @@ import { dataService } from "@/lib/dataService";
 import { Link } from "react-router-dom";
 import { Archive, ArrowLeft, Sparkles } from "lucide-react";
 import { format } from "date-fns";
-import { ImportFromChatGPT } from "@/components/agenda/ImportFromChatGPT";
 
-const SAMPLE_PLACEHOLDER = `Paste Daily Executive Processing report…
-
-## Overview
-Short paragraph framing the day.
-
-## Executive Signals
-High-level signals worth noticing.
+const SAMPLE_PLACEHOLDER = `Paste your notes here…
 
 ## Priority Actions
-- [BishBash] Send investor update — draft today, ship tomorrow
-- Review pricing experiment results
-
-## Possible Follow Ups
-- Reply to Sarah re: contract
-
-## Project Updates
-### BishBash
-- Onboarding flow ships tomorrow
-#### Next Steps
-- Final QA pass
-
-## Strategic Insights
-- The emotional feel of the flow matters as much as technical correctness.
-
-## Open Questions
-- Are we building for power users or first-timers first?
-
-## Parked Ideas
-- Public roadmap as marketing surface`;
+- Call school about trip form
+- Dentist for Mia before Friday, high
+- Pay nursery by the 30th`;
 
 export default function ProcessingInbox() {
   const { briefings, loading, createBriefing, refetch } = useBriefings();
@@ -69,7 +45,7 @@ export default function ProcessingInbox() {
           onClick={() => setActiveBriefing(null)}
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Inbox
+          <ArrowLeft className="h-4 w-4" /> Back to Paste notes
         </button>
         <BriefingView briefing={activeBriefing} />
       </div>
@@ -79,10 +55,9 @@ export default function ProcessingInbox() {
   return (
     <div className="px-4 sm:px-8 lg:px-12 py-10 max-w-5xl mx-auto">
       <div className="mb-10">
-        <div className="text-[10px] uppercase tracking-[0.22em] text-primary/80">Processing</div>
-        <h1 className="mt-1 text-3xl sm:text-4xl font-serif-display text-foreground">Processing Inbox</h1>
+        <h1 className="text-3xl sm:text-4xl font-serif-display text-foreground">Paste notes</h1>
         <p className="mt-2 text-muted-foreground max-w-2xl">
-          Paste a daily report and decide what deserves to become part of your system.
+          Paste your notes and choose which ones become tasks.
           Nothing is added automatically.
         </p>
       </div>
@@ -92,7 +67,7 @@ export default function ProcessingInbox() {
           <div className="flex items-start gap-3">
             <Sparkles className="h-4 w-4 text-primary mt-0.5" />
             <div className="text-sm text-foreground/85">
-              Briefings sync to your account. <Link to="/" className="underline text-primary">Sign in</Link> to save and revisit them.
+              Sign in to turn pasted notes into tasks. <Link to="/" className="underline text-primary">Sign in</Link>
             </div>
           </div>
         </div>
@@ -113,11 +88,6 @@ export default function ProcessingInbox() {
             {submitting ? "Creating…" : "Create Briefing"}
           </Button>
         </div>
-      </div>
-
-      {/* Manual ChatGPT bridge */}
-      <div className="mt-8">
-        <ImportFromChatGPT onImported={refetch} />
       </div>
 
       {/* Recent briefings */}

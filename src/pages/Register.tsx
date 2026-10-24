@@ -144,7 +144,7 @@ const Register = () => {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white py-2 rounded-lg transition-all duration-200 hover:shadow-lg"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2 rounded-lg"
             >
               Create Account
             </Button>
