@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/dataService";
 
 function initialsFor(name: string, email: string) {
   const source = name.trim() || email.trim();
@@ -42,11 +42,8 @@ export function AccountMenu() {
 
   const handleSignOut = async () => {
     if (isAuthenticated) {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
-      });
+      await dataService.signOut();
+      return;
     } else {
       toast({
         title: "Going home",

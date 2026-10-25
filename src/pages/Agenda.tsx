@@ -43,12 +43,6 @@ const Agenda = ({ hero = false }: { hero?: boolean }) => {
   const handleSignOut = async () => {
     if (isAuthenticated) {
       await dataService.signOut();
-      setIsAuthenticated(false);
-      setStorageType('local');
-      toast({
-        title: "Signed out",
-        description: "You've been signed out. Now using local storage.",
-      });
     } else {
       navigate("/");
       toast({

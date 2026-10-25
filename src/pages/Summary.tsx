@@ -1,17 +1,13 @@
 
+import { dataService } from "@/lib/dataService";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { CompletedTasksTable } from "@/components/completed-tasks/CompletedTasksTable";
 import { useCompletedTasks } from "@/hooks/useCompletedTasks";
 import { Trash2 } from "lucide-react";
 
 const Summary = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const {
     completedTasks,
     selectedTasks,
@@ -28,12 +24,7 @@ const Summary = () => {
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
+    await dataService.signOut();
   };
 
   return (

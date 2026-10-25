@@ -1,4 +1,5 @@
 
+import { dataService } from "@/lib/dataService";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -147,11 +148,8 @@ const Profile = () => {
 
   const handleSignOut = async () => {
     if (isAuthenticated) {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
-      });
+      await dataService.signOut();
+      return;
     } else {
       toast({
         title: "Going home",

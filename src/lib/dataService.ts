@@ -402,9 +402,15 @@ export class DataService {
     return { data, error };
   }
 
+  // Signs out and reloads at the home page, so every page and the account
+  // menu start again in local mode instead of showing the old session.
   async signOut() {
     const { error } = await supabase.auth.signOut();
+    // An expired session or no network makes the server call fail; still
+    // clear this device's session so the button always works.
+    if (error) await supabase.auth.signOut({ scope: "local" });
     this.isAuthenticated = false;
+    window.location.assign("/");
     return { error };
   }
 

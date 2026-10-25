@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { dataService } from "@/lib/dataService";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -113,12 +114,7 @@ const Customise = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
+    await dataService.signOut();
   };
 
   return (
