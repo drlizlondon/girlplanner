@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
 import CommandCentrePage from "./pages/CommandCentrePage";
+import Landing from "./pages/Landing";
 import ProcessingInbox from "./pages/ProcessingInbox";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
@@ -26,8 +27,9 @@ const App = () => (
         <Routes>
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/" element={<Landing />} />
           <Route element={<AppLayout />}>
-            <Route path="/" element={<CommandCentrePage />} />
+            <Route path="/today" element={<CommandCentrePage />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/inbox" element={<ProcessingInbox />} />
             <Route path="/summary" element={<Summary />} />

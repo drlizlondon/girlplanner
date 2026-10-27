@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, LogIn } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AuthModal } from "@/components/AuthModal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -36,21 +38,30 @@ export function AccountMenu() {
     refresh();
   }, [pathname, refresh]);
 
+  const [showAuth, setShowAuth] = useState(false);
+
   if (loading) return null;
 
-  const displayName = name || (isAuthenticated ? email : "Friend");
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Button size="sm" variant="outline" onClick={() => setShowAuth(true)}>
+          <LogIn className="mr-1.5 h-3.5 w-3.5" />
+          Sign in
+        </Button>
+        <AuthModal
+          isOpen={showAuth}
+          onClose={() => setShowAuth(false)}
+          onSuccess={() => { setShowAuth(false); window.location.assign("/agenda"); }}
+        />
+      </>
+    );
+  }
+
+  const displayName = name || email;
 
   const handleSignOut = async () => {
-    if (isAuthenticated) {
-      await dataService.signOut();
-      return;
-    } else {
-      toast({
-        title: "Going home",
-        description: "Returning to homepage.",
-      });
-    }
-    navigate("/");
+    await dataService.signOut();
   };
 
   return (

@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
 
 interface HeaderProps {
   onSignOut?: () => void;
@@ -10,7 +11,8 @@ interface HeaderProps {
 // Sidebar now provides navigation. This component is kept as a thin
 // sign-out affordance so existing pages don't need refactors.
 export const Header = ({ onSignOut, showSignOut = true }: HeaderProps) => {
-  if (!onSignOut || !showSignOut) return null;
+  const { isAuthenticated, loading } = useProfile();
+  if (!onSignOut || !showSignOut || loading || !isAuthenticated) return null;
   return (
     <div className="flex justify-end mb-4">
       <Button onClick={onSignOut} variant="outline" size="sm" className="text-muted-foreground">
