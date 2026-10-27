@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Today", url: "/", icon: LayoutDashboard },
+  { title: "Today", url: "/today", icon: LayoutDashboard },
   { title: "My list", url: "/agenda", icon: ListChecks },
   { title: "Paste notes", url: "/inbox", icon: Inbox },
   { title: "Voice Setup Guide", url: "/guide", icon: Mic },
