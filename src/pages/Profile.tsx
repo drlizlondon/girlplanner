@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 import { VoiceSetupGuide } from "@/components/VoiceSetupGuide";
+import { AssistantsCard } from "@/components/AssistantsCard";
 
 const Profile = () => {
   const { isAuthenticated, name: loadedName, photoUrl: loadedPhotoUrl, email, loading, refresh } = useProfile();
@@ -262,6 +263,8 @@ const Profile = () => {
             )}
           </div>
         </div>
+
+        {isAuthenticated && <AssistantsCard />}
 
         <div className="mt-8">
           <VoiceSetupGuide />
