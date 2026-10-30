@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      assistant_keys: {
+        Row: {
+          created_at: string
+          id: string
+          key_hash: string
+          key_hint: string
+          last_used_at: string | null
+          name: string
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key_hash: string
+          key_hint: string
+          last_used_at?: string | null
+          name: string
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key_hash?: string
+          key_hint?: string
+          last_used_at?: string | null
+          name?: string
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       briefing_suggestions: {
         Row: {
           briefing_id: string
@@ -597,7 +630,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      assistant_summary: { Args: { p_key: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

@@ -22,6 +22,13 @@
       "when": 1792743060175,
       "tag": "0002_restrict_profiles_select",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793350464011,
+      "tag": "0003_assistant_keys",
+      "breakpoints": true
     }
   ]
 }
