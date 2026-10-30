@@ -14,6 +14,7 @@ interface AssistantKeyRow {
   key_hint: string;
   created_at: string;
   last_used_at: string | null;
+  can_suggest?: boolean;
 }
 
 /**
@@ -32,10 +33,10 @@ export const AssistantsCard = () => {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   const reload = async () => {
-    const { data, error: err } = await keysTable()
-      .select("id,name,key_hint,created_at,last_used_at")
-      .is("revoked_at", null)
-      .order("created_at", { ascending: false });
+    const query = (cols: string) => keysTable().select(cols).is("revoked_at", null).order("created_at", { ascending: false });
+    let { data, error: err } = await query("id,name,key_hint,created_at,last_used_at,can_suggest");
+    // Before the second database update (20261030150000) can_suggest doesn't exist yet: keep working without it.
+    if (err) ({ data, error: err } = await query("id,name,key_hint,created_at,last_used_at"));
     if (err) setError("Couldn't load your assistants. If this is new, the database update may not be applied yet.");
     else { setRows(data || []); setError(null); }
     setLoading(false);
@@ -67,6 +68,12 @@ export const AssistantsCard = () => {
     }
   };
 
+  const setCanSuggest = async (id: string, can_suggest: boolean) => {
+    const { error: err } = await keysTable().update({ can_suggest }).eq("id", id);
+    if (err) { setError("Couldn't change that. If this is new, the database update may not be applied yet."); return; }
+    await reload();
+  };
+
   const disconnect = async (id: string) => {
     const { error: err } = await keysTable().update({ revoked_at: new Date().toISOString() }).eq("id", id);
     if (err) { setError("Couldn't disconnect. Try again."); return; }
@@ -79,7 +86,7 @@ export const AssistantsCard = () => {
       <div>
         <h2 className="text-xl sm:text-2xl font-dancing-script text-purple-700 dark:text-purple-300 font-bold">Assistants</h2>
         <p className="text-sm text-muted-foreground">
-          Let a tool you use, like Queen Mode, see how many to-dos you have and how many suggestions are waiting. It can't see what they say, and it can't change anything.
+          Let a tool you use, like Queen Mode, see how many to-dos you have and how many suggestions are waiting. If you switch on suggestions, it can also read your to-do titles (so it never suggests something twice) and add suggestions to your review list. It never adds to your list directly, and it can't change or delete anything.
         </p>
       </div>
 
@@ -125,6 +132,17 @@ export const AssistantsCard = () => {
               <p className="text-xs text-muted-foreground">
                 {r.last_used_at ? `Last used ${new Date(r.last_used_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}` : "Not used yet"}
               </p>
+              {typeof r.can_suggest === "boolean" && (
+              <label className="mt-1 flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={r.can_suggest}
+                  onChange={(e) => void setCanSuggest(r.id, e.target.checked)}
+                  className="h-4 w-4 accent-purple-600"
+                />
+                Can add suggestions for you to review
+              </label>
+              )}
             </div>
             {confirmingId === r.id ? (
               <div className="flex gap-2">
