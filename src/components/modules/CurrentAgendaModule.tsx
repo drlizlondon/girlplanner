@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { CheckSquare, ListChecks, Send, Star, Trash2, X, Check } from "lucide-react";
+import { CheckSquare, ListChecks, Send, Star, Trash2, X, Check, CalendarPlus } from "lucide-react";
 import { ModuleCard, QuickAdd, EmptyHint } from "./ModuleCard";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/types/task";
 import { ExportToChatGPTModal } from "@/components/agenda/ExportToChatGPTModal";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { lifeInboxUrl } from "@/lib/lifeInbox";
 
 export function CurrentAgendaModule({
   focusOnly = false,
@@ -144,6 +145,16 @@ function AgendaRow({
       {task.dueDate && (
         <span className="text-[11px] text-muted-foreground">{format(task.dueDate, "d MMM")}</span>
       )}
+      <a
+        href={lifeInboxUrl(task)}
+        target="_blank"
+        rel="noopener"
+        title="Send to Life Inbox (Big Picture Planner)"
+        aria-label={`Send "${task.title}" to Life Inbox`}
+        className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 transition"
+      >
+        <CalendarPlus className="h-3.5 w-3.5" />
+      </a>
       <button
         onClick={onFocus}
         title={isFocus ? "Remove from Focus" : "Move to Focus"}

@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2 } from "lucide-react";
+import { CalendarPlus, Trash2 } from "lucide-react";
 import { TaskTypeSelect } from "@/components/TaskTypeSelect";
 import { Task } from "@/types/task";
 import { TaskCheckmark } from "./task/TaskCheckmark";
 import { TaskTitle } from "./task/TaskTitle";
 import { TaskAdditionalInfo } from "./task/TaskAdditionalInfo";
 import { TaskDueDate } from "./task/TaskDueDate";
+import { lifeInboxUrl } from "@/lib/lifeInbox";
 
 interface TaskRowProps {
   task: Task;
@@ -93,6 +94,16 @@ export const TaskRow = ({
           additionalInfo={task.additional_info || ""}
           onUpdate={(additional_info) => onUpdateTask(task.id, { additional_info })}
         />
+        <a
+          href={lifeInboxUrl(task)}
+          target="_blank"
+          rel="noopener"
+          title="Send to Life Inbox (Big Picture Planner)"
+          className="inline-flex h-9 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-sm shadow-sm hover:bg-primary/10 hover:text-primary transition"
+        >
+          <CalendarPlus className="h-4 w-4" />
+          Life Inbox
+        </a>
       </div>
 
       {task.additional_info ? (
