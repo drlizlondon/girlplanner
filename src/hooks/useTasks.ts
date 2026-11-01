@@ -110,10 +110,9 @@ export const useTasks = () => {
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
     try {
-      const localUpdates = {
-        ...updates,
-        due_date: updates.dueDate?.toISOString(),
-      };
+      const localUpdates: Record<string, unknown> = { ...updates };
+      // Only touch due_date when the caller set dueDate; undefined there means "clear it".
+      if ("dueDate" in updates) localUpdates.due_date = updates.dueDate ? updates.dueDate.toISOString() : null;
 
       delete localUpdates.dueDate;
       delete localUpdates.files;

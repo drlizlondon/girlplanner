@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { CompletedTasksTable } from "@/components/completed-tasks/CompletedTasksTable";
 import { useCompletedTasks } from "@/hooks/useCompletedTasks";
 import { Trash2 } from "lucide-react";
+import { RecentActivityModule } from "@/components/modules/RecentActivityModule";
+import { BriefingsArchiveModule } from "@/components/modules/BriefingsArchiveModule";
 
 const Summary = () => {
   const {
@@ -62,6 +64,11 @@ const Summary = () => {
               onDeleteTask={handleDeleteTask}
             />
           </div>
+        </div>
+        {/* Moved from Today (GPL-1) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <RecentActivityModule span={6} />
+          <BriefingsArchiveModule span={6} />
         </div>
       </div>
     </div>

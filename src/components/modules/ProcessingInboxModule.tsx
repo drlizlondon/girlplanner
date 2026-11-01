@@ -4,9 +4,12 @@ import { Inbox, ArrowRight } from "lucide-react";
 import { ModuleCard, EmptyHint } from "./ModuleCard";
 import { supabase } from "@/integrations/supabase/client";
 
-export function ProcessingInboxModule({ span = 6 }: { span?: 4 | 6 | 8 | 12 }) {
+export function ProcessingInboxModule({
+  span = 6, title = "Processing Inbox", hideWhenEmpty = false,
+}: { span?: 4 | 6 | 8 | 12; title?: string; hideWhenEmpty?: boolean }) {
   const [items, setItems] = useState<any[]>([]);
   const [pendingTotal, setPendingTotal] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -18,12 +21,15 @@ export function ProcessingInboxModule({ span = 6 }: { span?: 4 | 6 | 8 | 12 }) {
         .limit(6);
       setItems(data || []);
       setPendingTotal(count || 0);
+      setLoaded(true);
     })();
   }, []);
 
+  if (hideWhenEmpty && (!loaded || pendingTotal === 0)) return null;
+
   return (
     <ModuleCard
-      title="Processing Inbox"
+      title={title}
       kicker={`${pendingTotal} pending`}
       icon={Inbox}
       accent="blue"

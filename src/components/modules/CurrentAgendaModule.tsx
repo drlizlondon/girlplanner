@@ -39,7 +39,7 @@ export function CurrentAgendaModule({
     <>
       <ModuleCard
         title={focusOnly ? "Focus Now" : "Current Agenda"}
-        kicker={focusOnly ? "Manually chosen" : "Trusted operational layer"}
+        kicker={focusOnly ? "Manually chosen" : undefined}
         icon={focusOnly ? Star : ListChecks}
         accent={focusOnly ? "coral" : "purple"}
         span={span}
@@ -83,7 +83,7 @@ export function CurrentAgendaModule({
         {visible.length === 0 ? (
           <EmptyHint>
             {focusOnly
-              ? "Promote items here when you want to focus. The agenda stays calm."
+              ? "Your focus list is empty."
               : "Add what's actually in flight. Items persist until you complete, pause, or archive them."}
           </EmptyHint>
         ) : (
