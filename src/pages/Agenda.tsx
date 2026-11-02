@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { AuthModal } from "@/components/AuthModal";
 import { dataService } from "@/lib/dataService";
 import { CompletedTasksWrapper } from "@/components/CompletedTasksWrapper";
+import { EMPTY_LIST_MESSAGE, showEmptyListMessage } from "@/lib/emptyList";
 
 const PRIORITY_RANK = { high: 3, medium: 2, low: 1 };
 
@@ -107,6 +108,13 @@ const Agenda = ({ hero = false }: { hero?: boolean }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {showEmptyListMessage(sortedTasks.length) && (
+            <TableRow className="hover:bg-transparent">
+              <TableCell colSpan={4} className="p-4 text-sm text-muted-foreground">
+                {EMPTY_LIST_MESSAGE}
+              </TableCell>
+            </TableRow>
+          )}
           {sortedTasks.map((task) => (
             <TableRow key={task.id} className="border-border hover:bg-muted/40 transition-colors">
               <TableCell className="p-2 sm:p-4">
