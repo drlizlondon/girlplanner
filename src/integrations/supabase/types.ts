@@ -49,6 +49,7 @@ export type Database = {
       }
       briefing_suggestions: {
         Row: {
+          assistant_kind: string | null
           briefing_id: string
           created_at: string
           description: string | null
@@ -68,6 +69,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assistant_kind?: string | null
           briefing_id: string
           created_at?: string
           description?: string | null
@@ -87,6 +89,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assistant_kind?: string | null
           briefing_id?: string
           created_at?: string
           description?: string | null

@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { dataService } from "@/lib/dataService";
 import { supabase } from "@/integrations/supabase/client";
+import { assistantKindLabel } from "@/lib/assistantKind";
 import { useToast } from "@/hooks/use-toast";
 import { Check, Archive, Lightbulb, Pencil, Plus, Save, Star, Briefcase, Trash2 } from "lucide-react";
 
@@ -125,7 +126,10 @@ export function SuggestionCard({ suggestion, onChange, variant = "primary" }: Pr
               {suggestion.project}
             </span>
           )}
-          {suggestion.source_section && (
+          {assistantKindLabel(suggestion.assistant_kind) && (
+            <span className="text-[10px] text-muted-foreground/70">{assistantKindLabel(suggestion.assistant_kind)}</span>
+          )}
+          {suggestion.source_section && !suggestion.source_section.startsWith("sms:") && (
             <span className="text-[10px] text-muted-foreground/70">from {suggestion.source_section}</span>
           )}
         </div>

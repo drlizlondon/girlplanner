@@ -28,6 +28,7 @@ export interface SuggestionRow {
   project: string | null;
   priority: string | null;
   source_section: string | null;
+  assistant_kind?: string | null;
   status: "pending" | "accepted" | "saved" | "archived";
   position: number;
   created_at: string;

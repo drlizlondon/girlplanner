@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Inbox, ArrowRight } from "lucide-react";
 import { ModuleCard, EmptyHint } from "./ModuleCard";
+import { assistantKindLabel } from "@/lib/assistantKind";
 import { supabase } from "@/integrations/supabase/client";
 
 export function ProcessingInboxModule({
@@ -15,7 +16,7 @@ export function ProcessingInboxModule({
     (async () => {
       const { data, count } = await (supabase as any)
         .from("briefing_suggestions")
-        .select("id,title,type,source,project,created_at", { count: "exact" })
+        .select("id,title,type,source,project,created_at,assistant_kind", { count: "exact" })
         .eq("status", "pending")
         .order("created_at", { ascending: false })
         .limit(6);
@@ -48,6 +49,9 @@ export function ProcessingInboxModule({
             <li key={s.id} className="text-[13.5px] text-foreground/90 leading-snug flex items-start gap-2">
               <span className="text-muted-foreground mt-1">—</span>
               <Link to="/inbox" className="hover:text-primary flex-1 min-w-0">{s.title}</Link>
+              {assistantKindLabel(s.assistant_kind) && (
+                <span className="text-[10px] text-muted-foreground/70">{assistantKindLabel(s.assistant_kind)}</span>
+              )}
               {s.source === "chatgpt_import" && (
                 <span className="text-[10px] uppercase tracking-[0.12em] text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded">
                   ChatGPT
