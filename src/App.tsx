@@ -15,12 +15,19 @@ import Agenda from "./pages/Agenda";
 import Summary from "./pages/Summary";
 import Customise from "./pages/Customise";
 import VoiceGuidePage from "./pages/VoiceGuidePage";
+import { useRecordAppOpen } from "@/hooks/useRecordAppOpen";
 
 const queryClient = new QueryClient();
+
+function RecordAppOpen() {
+  useRecordAppOpen();
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <RecordAppOpen />
       <Toaster />
       <Sonner />
       <BrowserRouter>
