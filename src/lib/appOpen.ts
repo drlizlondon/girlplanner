@@ -1,12 +1,16 @@
-// QM-4: Girl Planner records "opened today" once per local day (Europe/London)
-// for the signed-in owner, so Queen Mode can count mornings she opened it.
+// QM-4: Girl Planner records each open (throttled) for the signed-in owner,
+// keeping the first and latest open per local day (Europe/London), so Queen
+// Mode can count mornings she opened it after the morning message.
 
 /** The Europe/London calendar date (YYYY-MM-DD) for an instant. */
 export function londonDate(now: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London" }).format(now);
 }
 
-/** True when today has not been recorded yet in this page's memory. */
-export function shouldRecordOpen(lastRecorded: string | null, today: string): boolean {
-  return lastRecorded !== today;
+/** At most one record per this many ms; an open after the morning message must still be seen. */
+export const RECORD_EVERY_MS = 10 * 60 * 1000;
+
+/** True when nothing was recorded in this page in the last RECORD_EVERY_MS. */
+export function shouldRecordOpen(lastRecordedAtMs: number | null, nowMs: number): boolean {
+  return lastRecordedAtMs === null || nowMs - lastRecordedAtMs >= RECORD_EVERY_MS;
 }

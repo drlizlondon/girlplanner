@@ -7,22 +7,23 @@ type UntypedRpc = { rpc: (name: string, args: Record<string, unknown>) => Promis
 const rpc = (name: string, args: Record<string, unknown>) => (supabase as unknown as UntypedRpc).rpc(name, args);
 
 /**
- * Records "opened Girl Planner today" for a signed-in user: on load, and when
- * the tab becomes visible on a new day. No UI. Failures are silent.
- * The database insert is idempotent, so the last date is kept in memory only.
+ * Records "opened Girl Planner" for a signed-in user: on load, on sign-in and
+ * whenever the tab becomes visible, at most every 10 minutes. The database keeps
+ * the first and latest open per day. No UI. Failures are silent.
  */
 export function useRecordAppOpen() {
   useEffect(() => {
-    let last: string | null = null;
+    let last: number | null = null;
     let cancelled = false;
 
     const record = async () => {
-      const today = londonDate();
-      if (!shouldRecordOpen(last, today)) return;
+      const now = Date.now();
+      if (!shouldRecordOpen(last, now)) return;
+      const today = londonDate(new Date(now));
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session || cancelled) return;
-        last = today;
+        last = now;
         const { error } = await rpc("record_app_open", { p_open_date: today });
         if (error) { last = null; console.warn("record_app_open failed", error.message); }
       } catch (e) {

@@ -25,7 +25,9 @@ end $$;
 reset role;
 do $$ begin
   if (select first_opened_at from app_opens) <> (select first_opened_at from first_open) then raise exception 'FAIL first_opened_at changed'; end if;
-  raise notice 'PASS first_opened_at kept (on conflict do nothing)';
+  raise notice 'PASS first_opened_at kept';
+  if (select last_opened_at from app_opens) <= (select first_opened_at from first_open) then raise exception 'FAIL last_opened_at not moved on by the second open'; end if;
+  raise notice 'PASS last_opened_at moves to the latest open';
 end $$;
 
 -- Junk dates refused (more than 1 day from now UTC).
@@ -54,7 +56,13 @@ do $$ begin
   insert into app_opens (user_id, open_date) values ('11111111-1111-1111-1111-111111111111', (now() at time zone 'utc')::date - 1);
   raise exception 'FAIL B inserted a row for A';
 exception when insufficient_privilege then raise notice 'PASS user B cannot insert for A'; end $$;
+-- B cannot move A's latest open.
+update app_opens set last_opened_at = now() + interval '1 hour' where user_id = '11111111-1111-1111-1111-111111111111';
 reset role;
+do $$ begin
+  if (select last_opened_at from app_opens where user_id = '11111111-1111-1111-1111-111111111111') > now() + interval '30 minutes' then raise exception 'FAIL B updated A row'; end if;
+  raise notice 'PASS user B cannot update A rows';
+end $$;
 
 -- anon: cannot call record_app_open, cannot read app_opens.
 select set_config('request.jwt.claim.sub','', false);
@@ -73,6 +81,7 @@ do $$ declare r jsonb; rb jsonb; begin
   if jsonb_array_length(r->'opens') <> 1 then raise exception 'FAIL A opens %', r->'opens'; end if;
   if (r->'opens'->0->>'date')::date <> (now() at time zone 'utc')::date then raise exception 'FAIL A open date'; end if;
   if (r->'opens'->0 ? 'first_opened_at') is not true then raise exception 'FAIL first_opened_at'; end if;
+  if (r->'opens'->0 ? 'last_opened_at') is not true then raise exception 'FAIL last_opened_at'; end if;
   if (select count(*) from jsonb_object_keys(r)) <> 4 then raise exception 'FAIL fields %', r; end if;
   rb := assistant_summary('gpk_TESTKEY_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
   if jsonb_array_length(rb->'opens') <> 1
