@@ -14,6 +14,7 @@ import { Task, Priority } from "@/types/task";
 import { Link } from "react-router-dom";
 import { AuthModal } from "@/components/AuthModal";
 import { dataService } from "@/lib/dataService";
+import { LifeInboxLink } from "@/components/LifeInboxLink";
 import { CompletedTasksWrapper } from "@/components/CompletedTasksWrapper";
 import { EMPTY_LIST_MESSAGE, showEmptyListMessage } from "@/lib/emptyList";
 
@@ -173,6 +174,9 @@ const Agenda = ({ hero = false }: { hero?: boolean }) => {
                   Due {format(task.dueDate, "d MMM")}
                 </div>
               )}
+              <div className="mt-1.5">
+                <LifeInboxLink task={task} />
+              </div>
               </TableCell>
               <TableCell className="p-2 sm:p-4">
                 <select
@@ -232,48 +236,58 @@ const Agenda = ({ hero = false }: { hero?: boolean }) => {
               My list
             </h1>
           )}
-          <TaskForm ref={inputRef} onAddTask={addTask} />
+          {!showCompleted && (
+            <>
+            <TaskForm ref={inputRef} onAddTask={addTask} />
           
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3 sm:gap-4">
-            <div className="flex gap-2 sm:gap-4">
+            <div className="flex justify-end mb-4">
               <Button
-                variant={showCompleted ? "default" : "outline"}
-                onClick={() => setShowCompleted(!showCompleted)}
+                variant="ghost"
+                onClick={() => setIsAdvancedView(!isAdvancedView)}
                 size="sm"
                 className="text-xs sm:text-sm"
               >
-                <span className="hidden sm:inline">{showCompleted ? "Hide Completed" : "Show Completed"}</span>
-                <span className="sm:hidden">{showCompleted ? "Hide" : "Show"} Done</span>
+                <span className="hidden sm:inline">{isAdvancedView ? "Switch to Basic View" : "Switch to Advanced View"}</span>
+                <span className="sm:hidden">{isAdvancedView ? "Basic" : "Advanced"}</span>
               </Button>
             </div>
+          
+            {isAdvancedView ? (
+              <TaskTable
+                tasks={sortedTasks}
+                onTaskCompletion={completeTask}
+                onUpdateTask={updateTask}
+                onDeleteTask={deleteTask}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onSortChange={(field, order) => {
+                  setSortField(field);
+                  setSortOrder(order);
+                }}
+              />
+            ) : (
+              <BasicTable />
+            )}
+            </>
+          )}
+
+          {showCompleted && <CompletedTasksWrapper />}
+
+          <div className="flex justify-center">
             <Button
-              variant="ghost"
-              onClick={() => setIsAdvancedView(!isAdvancedView)}
+              variant="link"
+              onClick={() => setShowCompleted(!showCompleted)}
               size="sm"
-              className="text-xs sm:text-sm"
+              className="text-xs text-muted-foreground"
             >
-              {isAdvancedView ? "Hide details" : "Show details"}
+              {showCompleted ? "Back to my list" : (
+                <>
+                  <span className="hidden sm:inline">Show Completed</span>
+                  <span className="sm:hidden">Show done</span>
+                </>
+              )}
             </Button>
           </div>
-          
-          {isAdvancedView ? (
-            <TaskTable
-              tasks={sortedTasks}
-              onTaskCompletion={completeTask}
-              onUpdateTask={updateTask}
-              onDeleteTask={deleteTask}
-              sortField={sortField}
-              sortOrder={sortOrder}
-              onSortChange={(field, order) => {
-                setSortField(field);
-                setSortOrder(order);
-              }}
-            />
-          ) : (
-            <BasicTable />
-          )}
-          
-          {showCompleted && <CompletedTasksWrapper />}
 
           <p className="flex flex-wrap items-center justify-center gap-x-2 text-xs text-muted-foreground">
             {storageType === 'supabase' ? (

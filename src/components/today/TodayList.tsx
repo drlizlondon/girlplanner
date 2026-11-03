@@ -44,7 +44,7 @@ export function TodayList() {
         />
         <button
           type="submit"
-          className="shrink-0 h-12 px-5 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 disabled:opacity-50"
+          className="shrink-0 h-12 px-5 rounded-xl btn-brand font-semibold hover:opacity-90 disabled:opacity-50"
           disabled={!title.trim()}
         >
           Add

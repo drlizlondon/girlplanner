@@ -154,6 +154,9 @@
 }
 
 @layer components {
+  .btn-brand {
+    @apply bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white;
+  }
   .glow-card {
     background: var(--gradient-card);
     border: 1px solid hsl(var(--border-subtle));

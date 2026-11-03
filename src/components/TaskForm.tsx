@@ -37,7 +37,7 @@ export const TaskForm = forwardRef<HTMLInputElement, TaskFormProps>(({ onAddTask
         onKeyPress={handleKeyPress}
         className="flex-1 bg-background text-foreground border-border placeholder:text-muted-foreground focus-visible:ring-primary"
       />
-      <Button onClick={handleAddTask} className="shrink-0">
+      <Button onClick={handleAddTask} className="btn-brand shrink-0">
         <Plus className="h-4 w-4 mr-1" />
         Add
       </Button>
