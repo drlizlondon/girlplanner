@@ -8,7 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, Cloud, HardDrive, Trash2, Settings } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ArrowUpDown, Check, Cloud, HardDrive, Trash2, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { Task, Priority } from "@/types/task";
 import { Link } from "react-router-dom";
@@ -19,6 +25,13 @@ import { CompletedTasksWrapper } from "@/components/CompletedTasksWrapper";
 import { EMPTY_LIST_MESSAGE, showEmptyListMessage } from "@/lib/emptyList";
 
 const PRIORITY_RANK = { high: 3, medium: 2, low: 1 };
+
+const SORT_LABELS = {
+  due_date: "Due date",
+  priority: "Priority",
+  created_at: "Date added",
+  type: "Type",
+} as const;
 
 const Agenda = ({ hero = false }: { hero?: boolean }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -240,7 +253,32 @@ const Agenda = ({ hero = false }: { hero?: boolean }) => {
             <>
             <TaskForm ref={inputRef} onAddTask={addTask} />
           
-            <div className="flex justify-end mb-4">
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2 text-xs sm:text-sm">
+                    <ArrowUpDown className="h-4 w-4" />
+                    Sort: {SORT_LABELS[sortField]} {sortOrder === "asc" ? "↑" : "↓"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {(Object.keys(SORT_LABELS) as Array<keyof typeof SORT_LABELS>).map((field) => (
+                    <DropdownMenuItem
+                      key={field}
+                      onClick={() => {
+                        if (sortField === field) {
+                          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                        } else {
+                          setSortField(field);
+                          setSortOrder("asc");
+                        }
+                      }}
+                    >
+                      {SORT_LABELS[field]} {sortField === field && (sortOrder === "asc" ? "↑" : "↓")}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="ghost"
                 onClick={() => setIsAdvancedView(!isAdvancedView)}
