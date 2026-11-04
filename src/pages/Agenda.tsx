@@ -8,7 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, Cloud, HardDrive, Trash2, Settings } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ArrowUpDown, Check, Cloud, HardDrive, Trash2, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { Task, Priority } from "@/types/task";
 import { Link } from "react-router-dom";
