@@ -26,6 +26,13 @@ import { EMPTY_LIST_MESSAGE, showEmptyListMessage } from "@/lib/emptyList";
 
 const PRIORITY_RANK = { high: 3, medium: 2, low: 1 };
 
+const SORT_LABELS = {
+  due_date: "Due date",
+  priority: "Priority",
+  created_at: "Date added",
+  type: "Type",
+} as const;
+
 const Agenda = ({ hero = false }: { hero?: boolean }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { tasks, addTask, completeTask, updateTask, deleteTask } = useTasks();
