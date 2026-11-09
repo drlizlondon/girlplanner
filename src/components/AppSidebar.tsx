@@ -33,14 +33,15 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const closeOnMobile = () => { if (isMobile) setOpenMobile(false); };
   const collapsed = state === "collapsed";
   const { pathname } = useLocation();
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="px-3 pt-4 pb-2">
-        <NavLink to="/" className="flex items-center gap-2.5 px-2">
+        <NavLink to="/" onClick={closeOnMobile} className="flex items-center gap-2.5 px-2">
           <div className="h-8 w-8 rounded-lg border border-primary/40 bg-primary/10 flex items-center justify-center ">
             <Flower2 className="h-4 w-4 text-primary" />
           </div>
@@ -63,6 +64,7 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
                       <NavLink
                         to={item.url}
+                        onClick={closeOnMobile}
                         className={`group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors ${
                           active
                             ? "bg-sidebar-accent text-sidebar-accent-foreground"
