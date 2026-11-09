@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { ProcessingInboxModule } from "./modules/ProcessingInboxModule";
 import { TodayList } from "./today/TodayList";
+import { OpportunitiesModule } from "./modules/OpportunitiesModule";
 
 // GPL-1: Today is the list. Activity and the briefings archive live on /summary.
 export default function CommandCentre() {
@@ -16,6 +17,7 @@ export default function CommandCentre() {
       </header>
 
       <TodayList />
+      <OpportunitiesModule />
 
       <ProcessingInboxModule span={12} title="New to review" hideWhenEmpty />
     </div>

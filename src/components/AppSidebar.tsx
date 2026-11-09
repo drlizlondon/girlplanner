@@ -6,6 +6,7 @@ import {
   Mic,
   User,
   Flower2,
+  Sparkles,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -25,6 +26,7 @@ import {
 const items = [
   { title: "Today", url: "/today", icon: LayoutDashboard },
   { title: "My list", url: "/agenda", icon: ListChecks },
+  { title: "Opportunities", url: "/opportunities", icon: Sparkles },
   { title: "Paste notes", url: "/inbox", icon: Inbox },
   { title: "Voice Setup Guide", url: "/guide", icon: Mic },
   { title: "Account", url: "/profile", icon: User },

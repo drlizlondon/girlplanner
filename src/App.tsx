@@ -15,6 +15,7 @@ import Agenda from "./pages/Agenda";
 import Summary from "./pages/Summary";
 import Customise from "./pages/Customise";
 import VoiceGuidePage from "./pages/VoiceGuidePage";
+import Opportunities from "./pages/Opportunities";
 import { useRecordAppOpen } from "@/hooks/useRecordAppOpen";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/guide" element={<VoiceGuidePage />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/customise" element={<Customise />} />
+            <Route path="/opportunities" element={<Opportunities />} />
 
             {/* Redirect pruned legacy routes */}
             <Route path="/focus" element={<Navigate to="/agenda" replace />} />
@@ -53,7 +55,6 @@ const App = () => (
             <Route path="/ideas" element={<Navigate to="/inbox" replace />} />
             <Route path="/people-to-contact" element={<Navigate to="/agenda" replace />} />
             <Route path="/contact-history" element={<Navigate to="/agenda" replace />} />
-            <Route path="/opportunities" element={<Navigate to="/inbox" replace />} />
             <Route path="/calendar" element={<Navigate to="/agenda" replace />} />
             <Route path="/archive" element={<Navigate to="/inbox" replace />} />
             <Route path="/search" element={<Navigate to="/agenda" replace />} />
