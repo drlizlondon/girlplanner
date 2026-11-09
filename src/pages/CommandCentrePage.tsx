@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { dataService } from "@/lib/dataService";
 import CommandCentre from "@/components/CommandCentre";
 import Agenda from "@/pages/Agenda";
+import { OpportunitiesModule } from "@/components/modules/OpportunitiesModule";
 
 export default function CommandCentrePage() {
   const [checking, setChecking] = useState(true);
@@ -24,7 +25,7 @@ export default function CommandCentrePage() {
   }
 
   if (!authed) {
-    return <Agenda hero />;
+    return <><Agenda hero /><div className="max-w-3xl mx-auto px-4 sm:px-6 pb-8"><OpportunitiesModule /></div></>;
   }
 
   return <CommandCentre />;
