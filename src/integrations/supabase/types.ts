@@ -49,6 +49,7 @@ export type Database = {
       }
       briefing_suggestions: {
         Row: {
+          assistant_kind: string | null
           briefing_id: string
           created_at: string
           description: string | null
@@ -68,6 +69,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assistant_kind?: string | null
           briefing_id: string
           created_at?: string
           description?: string | null
@@ -87,6 +89,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assistant_kind?: string | null
           briefing_id?: string
           created_at?: string
           description?: string | null
@@ -630,6 +633,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _assistant_owner: { Args: { p_key: string }; Returns: string }
+      assistant_add_suggestion: {
+        Args: {
+          p_detail: string
+          p_key: string
+          p_kind: string
+          p_source: string
+          p_title: string
+        }
+        Returns: Json
+      }
       assistant_summary: { Args: { p_key: string }; Returns: Json }
     }
     Enums: {

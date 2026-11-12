@@ -29,6 +29,13 @@
       "when": 1793350464011,
       "tag": "0003_assistant_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794518933222,
+      "tag": "0004_assistant_suggestions",
+      "breakpoints": true
     }
   ]
 }
