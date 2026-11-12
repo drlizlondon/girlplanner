@@ -665,6 +665,10 @@ export type Database = {
         }
         Returns: Json
       }
+      assistant_completed_by_date: {
+        Args: { p_today: string; p_user: string }
+        Returns: Json
+      }
       assistant_summary: { Args: { p_key: string }; Returns: Json }
       record_app_open: { Args: { p_open_date: string }; Returns: undefined }
     }
