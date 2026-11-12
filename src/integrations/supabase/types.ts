@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_opens: {
+        Row: {
+          first_opened_at: string
+          last_opened_at: string
+          open_date: string
+          user_id: string
+        }
+        Insert: {
+          first_opened_at?: string
+          last_opened_at?: string
+          open_date: string
+          user_id: string
+        }
+        Update: {
+          first_opened_at?: string
+          last_opened_at?: string
+          open_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       assistant_keys: {
         Row: {
           created_at: string
@@ -645,6 +666,7 @@ export type Database = {
         Returns: Json
       }
       assistant_summary: { Args: { p_key: string }; Returns: Json }
+      record_app_open: { Args: { p_open_date: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
