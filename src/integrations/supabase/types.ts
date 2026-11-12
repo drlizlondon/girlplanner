@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_opens: {
+        Row: {
+          first_opened_at: string
+          last_opened_at: string
+          open_date: string
+          user_id: string
+        }
+        Insert: {
+          first_opened_at?: string
+          last_opened_at?: string
+          open_date: string
+          user_id: string
+        }
+        Update: {
+          first_opened_at?: string
+          last_opened_at?: string
+          open_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       assistant_keys: {
         Row: {
           created_at: string
@@ -49,6 +70,7 @@ export type Database = {
       }
       briefing_suggestions: {
         Row: {
+          assistant_kind: string | null
           briefing_id: string
           created_at: string
           description: string | null
@@ -68,6 +90,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assistant_kind?: string | null
           briefing_id: string
           created_at?: string
           description?: string | null
@@ -87,6 +110,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assistant_kind?: string | null
           briefing_id?: string
           created_at?: string
           description?: string | null
@@ -630,7 +654,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _assistant_owner: { Args: { p_key: string }; Returns: string }
+      assistant_add_suggestion: {
+        Args: {
+          p_detail: string
+          p_key: string
+          p_kind: string
+          p_source: string
+          p_title: string
+        }
+        Returns: Json
+      }
+      assistant_completed_by_date: {
+        Args: { p_today: string; p_user: string }
+        Returns: Json
+      }
       assistant_summary: { Args: { p_key: string }; Returns: Json }
+      record_app_open: { Args: { p_open_date: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

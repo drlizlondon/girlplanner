@@ -29,6 +29,27 @@
       "when": 1793350464011,
       "tag": "0003_assistant_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794518933222,
+      "tag": "0004_assistant_suggestions",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794518951612,
+      "tag": "0005_app_opens",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794518968768,
+      "tag": "0006_completed_today",
+      "breakpoints": true
     }
   ]
 }
